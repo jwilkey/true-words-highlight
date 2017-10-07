@@ -8,12 +8,14 @@
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
     "build": "node build/build.js",
+    "deploy": "gh-pages -d dist",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit/specs"
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "gh-pages": "^1.0.0",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0"
   },
