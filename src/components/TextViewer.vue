@@ -30,7 +30,7 @@ export default {
     search () {
       const self = this
       const url = `https://bible.truewordsapp.com/search/${this.query}`
-      axios.get(url, {headers: {'x-esv-api-key': '220c852e0d6abf77'}})
+      axios.get(url, {headers: {'x-esv-api-key': window.esv}})
       .then(function (response) {
         self.passage = response.data.passage.reference
         self.text = response.data.passage.verses.map(v => v.text.replace(/<[^>]?.>/g, ' ')).join(' ')
