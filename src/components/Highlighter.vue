@@ -51,9 +51,9 @@ function clean (word) {
 </script>
 
 <style lang="less" scoped>
+@import "../../static/less/colors";
+
 .highlighter {
-  background-color: #111;
-  color: #efefef;
   padding: 8px;
   font-size: 18px;
   line-height: 1.2;
@@ -63,23 +63,23 @@ function clean (word) {
     word-spacing: -3px;
   }
   .match {
-    color: black;
-    border: solid 1px #ffaa00;
-    background-color: rgba(255, 230, 0, 1);
+    color: @color-highlight-contrast;
+    border: solid 1px darken(@color-highlight-blue, 30%);
+    background-color: @color-highlight-blue;
   }
   .match-4 {
     color: white;
-    border: solid 1px rgba(255, 190, 0, 0.7);
-    background-color: rgba(255, 190, 0, 0.5);
+    border: solid 1px @color-highlight-blue;
+    background-color: fade(@color-highlight-blue, 50%);
   }
   .match-3 {
     color: white;
-    border: solid 1px rgba(255, 190, 0, 0.7);
-    background-color: rgba(255, 190, 0, 0.3);
+    border: solid 1px fade(@color-highlight-blue, 60%);
+    background-color: fade(@color-highlight-blue, 30%);
   }
   .match-2 {
     color: white;
-    background-color: rgba(255, 190, 0, 0.3);
+    background-color: fade(@color-highlight-blue, 30%);
   }
 }
 </style>

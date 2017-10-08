@@ -10,10 +10,12 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
+@import '../static/less/colors';
+
 body, html {
   height: 100%;
-  background-color: #111;
+  margin: 0;
 }
 #app {
   font-family: 'Source Sans Pro', sans-serif;
