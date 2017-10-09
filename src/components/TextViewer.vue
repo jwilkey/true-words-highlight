@@ -6,7 +6,7 @@
 
     <div id="searcher" class="theme-mid shadow-long" v-if="searchingPassage">
       <form @submit.prevent="search">
-        <input v-model="passageQuery" placeholder="Search Bible" />
+        <input v-model="passageQuery" placeholder="Search Bible" autofocus />
       </form>
       <button class="callout-light" v-if="passage" @click="searchingPassage = false">cancel</button>
     </div>
