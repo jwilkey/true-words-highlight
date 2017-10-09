@@ -12,6 +12,7 @@ export default {
 
 <style lang="less">
 @import '../static/less/colors';
+@import '../static/less/app';
 
 body, html {
   height: 100%;

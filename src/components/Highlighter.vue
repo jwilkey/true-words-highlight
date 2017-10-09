@@ -1,6 +1,6 @@
 <template>
   <div class="highlighter">
-    <span v-for="word in words" @click="wordSelected(word)" class="twh-word" :class="[word.status]">{{word.word}}</span>
+    <span v-for="word in words" @click="wordSelected(word)" class="twh-word" :class="wordClasses(word)">{{word.word}}</span>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default {
       words: []
     }
   },
-  props: ['text'],
+  props: ['text', 'query'],
   watch: {
     text () {
       this.words = this.text.split(/([^a-zA-Z]+)/g).map(word => {
@@ -21,6 +21,16 @@ export default {
     }
   },
   methods: {
+    wordClasses (word) {
+      var classes = [word.status]
+      if (this.query && word.word.toLowerCase().startsWith(this.query.toLowerCase())) {
+        classes.push('highlighted')
+      }
+      return classes
+    },
+    highlighted (word) {
+      return 'MATCH'
+    },
     wordSelected (word) {
       this.words.forEach(w => {
         var w1 = clean(w.word)
@@ -80,6 +90,10 @@ function clean (word) {
   .match-2 {
     color: white;
     background-color: fade(@color-highlight-blue, 30%);
+  }
+  .highlighted:not(.match):not(.match-4) {
+    border-color: @color-highlight-orange;
+    background: linear-gradient(transparent 70%, @color-highlight-orange 95%);
   }
 }
 </style>
