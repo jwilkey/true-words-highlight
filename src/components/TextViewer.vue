@@ -6,16 +6,19 @@
 
     <div id="searcher" class="theme-mid shadow-long" v-if="searchingPassage">
       <form @submit.prevent="search">
-        <input v-model="passageQuery" placeholder="Search Bible" autofocus />
+        <input v-model="passageQuery" placeholder="Search Bible passages" autofocus />
       </form>
       <button class="callout-light" v-if="passage" @click="searchingPassage = false">cancel</button>
     </div>
 
     <div id="content" class="flex-column" :class="{blur: searchingPassage}">
-      <div id="menubar" v-if="passage" class="theme-mid shadow">
+      <div id="menubar" v-if="passage" class="theme-mid shadow-long hi-bottom">
         <div class="flex-row align-center">
           <p class="flex-one passage" @click="startSearch">{{passage}} <i class="fa fa-edit callout-light alt"></i></p>
-          <i class="fa fa-search" @click="startSearchText"></i>
+          <div class="buttons">
+            <i class="fa fa-file-text-o" :class="{active: showWordCounts}" @click="toggleWordCounts"></i>
+            <i class="fa fa-search" :class="{active: searchingText}" @click="toggleSearchText"></i>
+          </div>
         </div>
         <div v-if="searchingText" class="text-search flex-row align-center">
           <input v-model="textQuery" placeholder="search text" />
@@ -23,13 +26,17 @@
         </div>
       </div>
 
-      <highlighter class="flex-one substance" :text="text" :query="textQuery"></highlighter>
+      <div class="flex-one substance relative">
+        <highlighter :text="text" :query="textQuery"></highlighter>
+        <word-count v-if="showWordCounts" class="right-menu shadow-long scrolly"></word-count>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Highlighter from './Highlighter'
+import WordCount from './WordCount'
 import axios from 'axios'
 
 export default {
@@ -42,10 +49,11 @@ export default {
       textQuery: '',
       searchingPassage: true,
       searchingText: false,
+      showWordCounts: false,
       loading: false
     }
   },
-  components: {Highlighter},
+  components: { Highlighter, WordCount },
   methods: {
     startSearch () {
       this.searchingPassage = true
@@ -66,15 +74,20 @@ export default {
         self.text = response.data.passage.verses.map(v => v.text.replace(/<[^>]?.>/g, ' ')).join(' ')
       })
     },
-    startSearchText () {
-      this.searchingText = true
-      this.$nextTick(() => {
-        this.$el.querySelector('#menubar input').focus()
-      })
+    toggleSearchText () {
+      this.searchingText = !this.searchingText
+      if (this.searchingText) {
+        this.$nextTick(() => {
+          this.$el.querySelector('#menubar input').focus()
+        })
+      }
     },
     clearTextQuery () {
       this.textQuery = ''
       this.$el.querySelector('#menubar input').focus()
+    },
+    toggleWordCounts () {
+      this.showWordCounts = !this.showWordCounts
     }
   }
 }
@@ -82,6 +95,7 @@ export default {
 
 <style lang="less" scoped>
 @import "../../static/less/flex";
+@import "../../static/less/colors";
 
 .text-viewer {
 }
@@ -106,6 +120,14 @@ export default {
   right: 0;
   #menubar {
     padding: 5px 15px;
+    .buttons {
+      i {
+        margin-left: 10px;
+        &.active {
+          color: @color-highlight-green;
+        }
+      }
+    }
   }
   .substance {
     overflow-x: hidden;
@@ -133,6 +155,17 @@ input {
     margin-left: 15px;
   }
 }
+.relative {
+  position: relative;
+}
+.right-menu {
+  position: fixed;
+  right: 0;
+  top: 75px;
+  bottom: 10px;
+  width: 250px;
+  border-top: solid 5px rgba(0, 0, 0, 0.5);
+}
 .loading {
   position: fixed;
   top: 0;
@@ -144,5 +177,8 @@ input {
 }
 .blur {
   filter: blur(3px);
+}
+.freeze {
+  overflow-y: hidden;
 }
 </style>

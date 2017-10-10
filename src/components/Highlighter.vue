@@ -5,31 +5,37 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   name: 'highlighter',
   data () {
     return {
-      words: []
     }
   },
   props: ['text', 'query'],
   watch: {
     text () {
-      this.words = this.text.split(/([^a-zA-Z]+)/g).map(word => {
-        return {word, status: ''}
-      })
+      this.extractWords()
     }
   },
+  computed: {
+    ...mapGetters(['words'])
+  },
   methods: {
+    ...mapActions(['setWords']),
+    extractWords () {
+      const words = this.text.split(/([^a-zA-Z]+)/g).map(word => {
+        return {word, status: ''}
+      })
+      this.setWords(words)
+    },
     wordClasses (word) {
       var classes = [word.status]
       if (this.query && word.word.toLowerCase().startsWith(this.query.toLowerCase())) {
         classes.push('highlighted')
       }
       return classes
-    },
-    highlighted (word) {
-      return 'MATCH'
     },
     wordSelected (word) {
       this.words.forEach(w => {
