@@ -14,7 +14,8 @@
     <div id="content" class="flex-column" :class="{blur: searchingPassage}">
       <div id="menubar" v-if="passage" class="theme-mid shadow-long hi-bottom">
         <div class="flex-row align-center">
-          <p class="flex-one passage" @click="startSearch">{{passage}} <i class="fa fa-edit callout-light alt"></i></p>
+          <p class="passage" @click="startSearch">{{passage}} <i class="fa fa-edit callout-light alt"></i></p>
+          <div class="flex-one"></div>
           <div class="buttons">
             <i class="fa fa-file-text-o" :class="{active: showWordCounts}" @click="toggleWordCounts"></i>
             <i class="fa fa-search" :class="{active: searchingText}" @click="toggleSearchText"></i>
@@ -71,7 +72,11 @@ export default {
         self.loading = false
         self.passageQuery = ''
         self.passage = response.data.passage.reference
-        self.text = response.data.passage.verses.map(v => v.text.replace(/<[^>]?.>/g, ' ')).join(' ')
+        self.text = response.data.passage.verses.map(v => {
+          const text = v.text.replace(/<f>.*<\/f>/g, '')
+          const chapter = v.number === 1 ? `\n[${v.chapter}:` : '['
+          return `${chapter}${v.number}] ${text}`
+        }).join(' ')
       })
     },
     toggleSearchText () {

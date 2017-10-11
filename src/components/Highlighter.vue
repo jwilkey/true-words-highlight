@@ -25,8 +25,10 @@ export default {
   methods: {
     ...mapActions(['setWords']),
     extractWords () {
-      const words = this.text.split(/([^a-zA-Z]+)/g).map(word => {
-        return {word, status: ''}
+      const words = this.text.split(/([^a-zA-Z\n]+)/g).map(word => {
+        return word === '\n'
+        ? {word, status: 'break'}
+        : {word, status: ''}
       })
       this.setWords(words)
     },
@@ -56,8 +58,6 @@ export default {
         }
       })
     }
-  },
-  mounted () {
   }
 }
 
@@ -76,7 +76,11 @@ function clean (word) {
   .twh-word {
     border-radius: 2px;
     border: solid 1px transparent;
-    word-spacing: -3px;
+    word-spacing: -1px;
+  }
+  .break {
+    display: block;
+    margin-top: 5px;
   }
   .match {
     color: @color-highlight-contrast;
