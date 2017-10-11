@@ -17,11 +17,11 @@
           <p class="passage" @click="startSearch">{{passage}} <i class="fa fa-edit callout-light alt"></i></p>
           <div class="flex-one"></div>
           <div class="buttons">
-            <i class="fa fa-file-text-o" :class="{active: showWordCounts}" @click="toggleWordCounts"></i>
-            <i class="fa fa-search" :class="{active: searchingText}" @click="toggleSearchText"></i>
+            <i class="fa fa-file-text-o" :class="{active: mode === 'word-counts'}" @click="toggleWordCounts"></i>
+            <i class="fa fa-search" :class="{active: mode === 'search'}" @click="toggleSearchText"></i>
           </div>
         </div>
-        <div v-if="searchingText" class="text-search flex-row align-center">
+        <div v-if="mode === 'search'" class="text-search flex-row align-center">
           <input v-model="textQuery" placeholder="search text" />
           <i @click="clearTextQuery" class="fa fa-close red"></i>
         </div>
@@ -29,7 +29,7 @@
 
       <div class="flex-one substance relative">
         <highlighter :text="text" :query="textQuery"></highlighter>
-        <word-count v-if="showWordCounts" class="right-menu shadow-long scrolly"></word-count>
+        <word-count v-if="mode === 'word-counts'" class="right-menu shadow-long scrolly"></word-count>
       </div>
     </div>
   </div>
@@ -49,8 +49,7 @@ export default {
       passageQuery: '',
       textQuery: '',
       searchingPassage: true,
-      searchingText: false,
-      showWordCounts: false,
+      mode: undefined,
       loading: false
     }
   },
@@ -80,8 +79,8 @@ export default {
       })
     },
     toggleSearchText () {
-      this.searchingText = !this.searchingText
-      if (this.searchingText) {
+      this.mode = this.mode === 'search' ? undefined : 'search'
+      if (this.mode === 'search') {
         this.$nextTick(() => {
           this.$el.querySelector('#menubar input').focus()
         })
@@ -92,7 +91,7 @@ export default {
       this.$el.querySelector('#menubar input').focus()
     },
     toggleWordCounts () {
-      this.showWordCounts = !this.showWordCounts
+      this.mode = this.mode === 'word-counts' ? undefined : 'word-counts'
     }
   }
 }
