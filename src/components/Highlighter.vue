@@ -1,6 +1,6 @@
 <template>
   <div class="highlighter">
-    <span v-for="word in words" @click="wordSelected(word)" class="twh-word" :class="wordClasses(word)">{{word.word}}</span>
+    <span v-for="word in words" @click="wordPressed(word)" class="twh-word" :class="wordClasses(word)">{{word.word}}</span>
   </div>
 </template>
 
@@ -18,13 +18,16 @@ export default {
   watch: {
     text () {
       this.extractWords()
+    },
+    selectedWord () {
+      this.applySelection()
     }
   },
   computed: {
-    ...mapGetters(['words'])
+    ...mapGetters(['words', 'selectedWord'])
   },
   methods: {
-    ...mapActions(['setWords']),
+    ...mapActions(['setWords', 'wordSelected']),
     extractWords () {
       const words = this.text.split(/([^a-zA-Z\n]+)/g).map(word => {
         return word === '\n'
@@ -40,7 +43,10 @@ export default {
       }
       return classes
     },
-    wordSelected (word) {
+    wordPressed (word) {
+      this.wordSelected(word.word)
+    },
+    applySelection () {
       const skip = [' ', ', ', '; ', '\n']
       this.words.every(w => {
         if (skip.includes(w.word)) {
@@ -48,7 +54,7 @@ export default {
         }
 
         var w1 = clean(w.word)
-        var w2 = clean(word.word)
+        var w2 = clean(this.selectedWord)
         if (w1 === w2) {
           w.status = 'match'
         } else {
@@ -66,7 +72,7 @@ export default {
       })
 
       const self = this
-      synonymService.fetchSynonyms(word.word)
+      synonymService.fetchSynonyms(this.selectedWord)
       .then(synonyms => {
         self.words.forEach(w => {
           var w1 = clean(w.word)
@@ -107,7 +113,8 @@ function clean (word) {
     background-color: fade(@color-highlight-red, 50%);
   }
   .match {
-    color: @color-highlight-contrast;
+    text-shadow: 1px 0px 3px black;
+    color: white;
     border: solid 1px darken(@color-highlight-blue, 30%);
     background-color: @color-highlight-blue;
   }

@@ -30,7 +30,10 @@
 
       <div class="flex-one substance relative">
         <highlighter :text="text" :query="textQuery"></highlighter>
-        <word-count v-if="mode === 'word-counts'" class="right-menu shadow-long scrolly"></word-count>
+        <div class="right-menu shadow-long">
+          <word-count v-if="mode === 'word-counts'" class="scrolly"></word-count>
+          <div class="fade-away"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -173,8 +176,18 @@ input {
   right: 0;
   top: 75px;
   bottom: 10px;
-  width: 250px;
   border-top: solid 5px rgba(0, 0, 0, 0.5);
+  .word-count {
+    height: 100%;
+  }
+  .fade-away {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 15%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+  }
 }
 .loading {
   position: fixed;

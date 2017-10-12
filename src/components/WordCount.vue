@@ -1,11 +1,11 @@
 <template>
   <div class="word-count theme-mid">
-    <p v-for="word in wordCounts" class="hi-bottom">{{word[0]}} - {{word[1]}}</p>
+    <p v-for="word in wordCounts" class="hi-bottom" @click="wordPressed(word[0])"><span class="count callout-light">{{word[1]}}</span> {{word[0]}}</p>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'text-viewer',
@@ -15,6 +15,12 @@ export default {
   },
   computed: {
     ...mapGetters(['wordCounts'])
+  },
+  methods: {
+    ...mapActions(['wordSelected']),
+    wordPressed (word) {
+      this.wordSelected(word)
+    }
   }
 }
 </script>
@@ -25,6 +31,12 @@ export default {
   p {
     padding: 8px;
     margin: 0;
+    cursor: pointer;
+  }
+  .count {
+    padding: 3px 8px;
+    border-radius: 16px;
+    margin-right: 8px;
   }
 }
 </style>
