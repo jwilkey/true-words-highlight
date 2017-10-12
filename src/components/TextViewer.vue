@@ -7,11 +7,12 @@
     <div id="searcher" class="theme-mid shadow-long" v-if="searchingPassage">
       <form @submit.prevent="search">
         <input v-model="passageQuery" placeholder="Search Bible passages" autofocus />
+        <button class="callout-light" @click.prevent="search" :disabled="!passageQuery">search</button>
+        <button class="callout-light alt" v-if="passage" @click.prevent="searchingPassage = false">cancel</button>
       </form>
-      <button class="callout-light" v-if="passage" @click="searchingPassage = false">cancel</button>
     </div>
 
-    <div id="content" class="flex-column" :class="{blur: searchingPassage}">
+    <div id="content" class="flex-column" :class="{blur: searchingPassage || loading}">
       <div id="menubar" v-if="passage" class="theme-mid shadow-long hi-bottom">
         <div class="flex-row align-center">
           <p class="passage" @click="startSearch">{{passage}} <i class="fa fa-edit callout-light alt"></i></p>
@@ -108,12 +109,17 @@ export default {
   top: 20%;
   left: 20px;
   right: 20px;
-  padding: 20px 8px;
+  padding: 20px 15px;
   border-radius: 2px;
   z-index: 100;
   button {
     margin-top: 15px;
+    margin-left: 15px;
     float: right;
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   }
 }
 #content {
@@ -126,9 +132,10 @@ export default {
     padding: 5px 15px;
     .buttons {
       i {
-        margin-left: 10px;
+        padding-left: 15px;
         &.active {
           color: @color-highlight-green;
+          text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
         }
       }
     }
@@ -140,7 +147,6 @@ export default {
 input {
   box-sizing: border-box;
   width: 100%;
-  color: white;
   background-color: transparent;
   border: none;
   outline: none;
@@ -178,6 +184,7 @@ input {
   right: 0;
   background-color: rgba(0, 0, 0, 0.3);
   height: 100%;
+  z-index: 1000;
 }
 .blur {
   filter: blur(3px);

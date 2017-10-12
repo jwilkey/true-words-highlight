@@ -6,6 +6,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import synonymService from '../services/synonym_service'
 
 export default {
   name: 'highlighter',
@@ -40,7 +41,12 @@ export default {
       return classes
     },
     wordSelected (word) {
-      this.words.forEach(w => {
+      const skip = [' ', ', ', '; ', '\n']
+      this.words.every(w => {
+        if (skip.includes(w.word)) {
+          return true
+        }
+
         var w1 = clean(w.word)
         var w2 = clean(word.word)
         if (w1 === w2) {
@@ -56,6 +62,18 @@ export default {
           }
           w.status = matchLevel > 0 ? `match-${matchLevel}` : ''
         }
+        return true
+      })
+
+      const self = this
+      synonymService.fetchSynonyms(word.word)
+      .then(synonyms => {
+        self.words.forEach(w => {
+          var w1 = clean(w.word)
+          if (synonyms.includes(w1)) {
+            w.status = w.status || 'synonym'
+          }
+        })
       })
     }
   }
@@ -82,23 +100,26 @@ function clean (word) {
     display: block;
     margin-top: 5px;
   }
+  .synonym {
+    text-shadow: 1px 0px 3px black;
+    color: white;
+    border: solid 1px @color-highlight-red;
+    background-color: fade(@color-highlight-red, 50%);
+  }
   .match {
     color: @color-highlight-contrast;
     border: solid 1px darken(@color-highlight-blue, 30%);
     background-color: @color-highlight-blue;
   }
   .match-4 {
-    color: white;
     border: solid 1px @color-highlight-blue;
     background-color: fade(@color-highlight-blue, 50%);
   }
   .match-3 {
-    color: white;
     border: solid 1px fade(@color-highlight-blue, 60%);
     background-color: fade(@color-highlight-blue, 30%);
   }
   .match-2 {
-    color: white;
     background-color: fade(@color-highlight-blue, 30%);
   }
   .highlighted:not(.match):not(.match-4) {
