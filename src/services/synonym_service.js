@@ -8,7 +8,7 @@ export default {
       return Promise.resolve(synonyms[word])
     }
 
-    const base = 'http://thesaurus.altervista.org/thesaurus/v1'
+    const base = 'https://thesaurus.altervista.org/thesaurus/v1'
     const synKey = 'CQMMQFvjuOzTzfUzQCrz'
     const url = `${base}?key=${synKey}&language=en_US&output=json&word=${word}`
 
