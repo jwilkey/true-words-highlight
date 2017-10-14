@@ -18,6 +18,10 @@
           <p class="passage" @click="startSearch">{{passage}} <i class="fa fa-edit callout-light alt"></i></p>
           <div class="flex-one"></div>
           <div class="buttons">
+            <div class="zoom">
+              <i class="fa fa-minus shadow" @click.prevent="zoomOut"></i>
+              <i class="fa fa-plus shadow" @click.prevent="zoomIn"></i>
+            </div>
             <i class="fa fa-file-text-o" :class="{active: mode === 'word-counts'}" @click="toggleWordCounts"></i>
             <i class="fa fa-search" :class="{active: mode === 'search'}" @click="toggleSearchText"></i>
           </div>
@@ -31,7 +35,7 @@
       </div>
 
       <div class="flex-one substance relative">
-        <highlighter :text="text" :query="textQuery"></highlighter>
+        <highlighter ref="highlighter" :text="text" :query="textQuery"></highlighter>
         <transition name="slide">
           <div v-if="mode === 'word-counts'" class="right-menu shadow-long">
             <word-count class="scrolly"></word-count>
@@ -100,8 +104,24 @@ export default {
     },
     toggleWordCounts () {
       this.mode = this.mode === 'word-counts' ? undefined : 'word-counts'
+    },
+    zoomOut () {
+      const highlighter = this.$refs.highlighter.$el
+      const fontSize = getFontSize(highlighter)
+      const newFontSize = fontSize === 1 ? 1 : fontSize - 1
+      highlighter.style.fontSize = `${newFontSize}px`
+    },
+    zoomIn () {
+      const highlighter = this.$refs.highlighter.$el
+      const fontSize = getFontSize(this.$refs.highlighter.$el)
+      const newFontSize = fontSize === 40 ? 40 : fontSize + 1
+      highlighter.style.fontSize = `${newFontSize}px`
     }
   }
+}
+
+function getFontSize (element) {
+  return parseInt(window.getComputedStyle(element, null).getPropertyValue('font-size'))
 }
 </script>
 
@@ -137,12 +157,23 @@ export default {
   right: 0;
   #menubar {
     padding: 5px 15px;
+    user-select: none;
     .buttons {
       i {
+        cursor: pointer;
+      }
+      & > * {
         padding-left: 15px;
+        display: inline-block;
         &.active {
           color: @color-highlight-green;
           text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+        }
+      }
+      .zoom {
+        i {
+          padding: 5px 8px;
+          border-radius: 2px;
         }
       }
     }
