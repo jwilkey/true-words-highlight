@@ -22,18 +22,22 @@
             <i class="fa fa-search" :class="{active: mode === 'search'}" @click="toggleSearchText"></i>
           </div>
         </div>
-        <div v-if="mode === 'search'" class="text-search flex-row align-center">
-          <input v-model="textQuery" placeholder="search text" />
-          <i @click="clearTextQuery" class="fa fa-close red"></i>
-        </div>
+        <transition name="slide">
+          <div v-if="mode === 'search'" class="text-search flex-row align-center">
+            <input v-model="textQuery" placeholder="search text" />
+            <i @click="clearTextQuery" class="fa fa-close red"></i>
+          </div>
+        </transition>
       </div>
 
       <div class="flex-one substance relative">
         <highlighter :text="text" :query="textQuery"></highlighter>
-        <div class="right-menu shadow-long">
-          <word-count v-if="mode === 'word-counts'" class="scrolly"></word-count>
-          <div class="fade-away"></div>
-        </div>
+        <transition name="slide">
+          <div v-if="mode === 'word-counts'" class="right-menu shadow-long">
+            <word-count class="scrolly"></word-count>
+            <div class="fade-away"></div>
+          </div>
+        </transition>
       </div>
     </div>
   </div>
@@ -185,7 +189,7 @@ input {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 15%;
+    height: 10px;
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
   }
 }
@@ -204,5 +208,11 @@ input {
 }
 .freeze {
   overflow-y: hidden;
+}
+.slide-enter-active, .slide-leave-active {
+  transition: transform .5s
+}
+.slide-enter, .slide-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  transform: translateX(100%);
 }
 </style>
