@@ -131,7 +131,7 @@ function clean (word) {
   }
   .highlighted:not(.match):not(.match-4) {
     border-color: @color-highlight-orange;
-    background: linear-gradient(transparent 70%, @color-highlight-orange 95%);
+    background: fade(@color-highlight-orange, 40%);
   }
 }
 </style>
