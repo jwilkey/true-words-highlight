@@ -4,18 +4,28 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export const state = {
+  passage: '',
+  text: '',
   words: [],
   wordCounts: {},
   selectedWord: undefined
 }
 
 export const getters = {
+  passage: state => state.passage,
+  text: state => state.text,
   words: state => state.words,
   wordCounts: state => state.wordCounts,
   selectedWord: state => state.selectedWord
 }
 
 export const actions = {
+  setPassage ({ commit }, passage) {
+    commit('SET_PASSAGE', passage)
+  },
+  setText ({ commit }, text) {
+    commit('SET_TEXT', text)
+  },
   setWords ({ commit }, words) {
     commit('SET_WORDS', words)
 
@@ -35,6 +45,12 @@ export const actions = {
 }
 
 export const mutations = {
+  SET_PASSAGE (state, passage) {
+    state.passage = passage
+  },
+  SET_TEXT (state, text) {
+    state.text = text
+  },
   SET_WORDS (state, words) {
     state.words = words
   },
