@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export const state = {
+  alertMessage: '',
   translation: 'ESV',
   passage: '',
   text: '',
@@ -13,6 +14,7 @@ export const state = {
 }
 
 export const getters = {
+  alertMessage: state => state.alertMessage,
   translation: state => state.translation,
   passage: state => state.passage,
   text: state => state.text,
@@ -22,6 +24,9 @@ export const getters = {
 }
 
 export const actions = {
+  setAlert ({ commit }, message) {
+    commit('SET_ALERT_MESSAGE', message)
+  },
   setTranslation ({ commit }, translation) {
     commit('SET_TRANSLATION', translation)
   },
@@ -50,6 +55,9 @@ export const actions = {
 }
 
 export const mutations = {
+  SET_ALERT_MESSAGE (state, message) {
+    state.alertMessage = message
+  },
   SET_TRANSLATION (state, translation) {
     state.translation = translation
   },

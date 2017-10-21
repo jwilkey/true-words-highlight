@@ -79,15 +79,19 @@ export default {
         .then(words => {
           self.setWords(words)
           self.onDone()
-        })
+        }, this.onFail)
       } else {
         dbtService.fetch(this.bookId)
         .then(words => {
           self.setPassage(self.bookId)
           self.setWords(words)
           self.onDone()
-        })
+        }, this.onFail)
       }
+    },
+    onFail () {
+      this.loading = false
+      this.alert('There was a loading error. Check your network connection and try again.')
     },
     searchESV () {
       const self = this
