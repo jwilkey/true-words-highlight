@@ -21,8 +21,8 @@
           <option value="EPT">EPT - Ancient Greek</option>
         </select>
         <div class="flex-one"></div>
-        <button class="callout-light alt" v-if="passage" @click.prevent="onDone">cancel</button>
-        <button class="callout-light" @click.prevent="search" :disabled="isDisabled">{{searchButtonText}}</button>
+        <button type="button" class="callout-light alt" v-if="passage" @click.prevent="onDone">cancel</button>
+        <button type="submit" class="callout-light" @click.prevent="search" :disabled="isDisabled">{{searchButtonText}}</button>
       </div>
     </form>
   </div>
