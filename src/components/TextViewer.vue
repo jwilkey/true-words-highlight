@@ -25,13 +25,17 @@
       </div>
 
       <div class="flex-one substance relative">
-        <highlighter ref="highlighter" :text="text" :query="textQuery"></highlighter>
+        <highlighter ref="highlighter" :query="textQuery"></highlighter>
         <transition name="slide">
           <div v-if="mode === 'word-counts'" class="right-menu shadow-long">
             <word-count class="scrolly"></word-count>
             <div class="fade-away"></div>
           </div>
         </transition>
+
+        <div v-if="selectedWord" class="bottom-display theme-mid shadow-top">
+          <span class="count">{{ wordCount }}</span> <span class="blue">{{ cleanWord }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -54,7 +58,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['passage', 'text'])
+    ...mapGetters(['passage', 'text', 'selectedWord', 'wordCounts']),
+    cleanWord () {
+      return clean(this.selectedWord)
+    },
+    wordCount () {
+      const count = [...this.wordCounts].find(wc => wc[0] === this.selectedWord)
+      return count ? count[1] : undefined
+    }
   },
   components: { SearchBox, Highlighter, WordCount },
   methods: {
@@ -94,6 +105,12 @@ export default {
   }
 }
 
+function clean (word) {
+  if (word === undefined) {
+    return word
+  }
+  return word.toLowerCase().replace(/[,."?;:]/g, '')
+}
 function getFontSize (element) {
   return parseInt(window.getComputedStyle(element, null).getPropertyValue('font-size'))
 }
@@ -165,7 +182,8 @@ function getFontSize (element) {
   position: fixed;
   right: 0;
   top: 75px;
-  bottom: 10px;
+  bottom: 40px;
+  z-index: 1000;
   .word-count {
     height: 100%;
   }
@@ -176,6 +194,22 @@ function getFontSize (element) {
     right: 0;
     height: 10px;
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+  }
+}
+.bottom-display {
+  position: fixed;
+  z-index: 900;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6px;
+  .count {
+    padding: 1px 8px;
+    border-radius: 16px;
+    margin: 0 8px;
+    background-color: @color-highlight-blue;
+    color: white;
+    text-shadow: 1px 0px 3px black;
   }
 }
 .blur {

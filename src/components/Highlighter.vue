@@ -14,28 +14,17 @@ export default {
     return {
     }
   },
-  props: ['text', 'query'],
+  props: ['query'],
   watch: {
-    text () {
-      this.extractWords()
-    },
     selectedWord () {
       this.applySelection()
     }
   },
   computed: {
-    ...mapGetters(['words', 'selectedWord'])
+    ...mapGetters(['words', 'selectedWord', 'translation'])
   },
   methods: {
     ...mapActions(['setWords', 'wordSelected']),
-    extractWords () {
-      const words = this.text.split(/([^a-zA-Z\n]+)/g).map(word => {
-        return word === '\n'
-        ? {word, status: 'break'}
-        : {word, status: ''}
-      })
-      this.setWords(words)
-    },
     wordClasses (word) {
       var classes = [word.status]
       if (this.query && word.word.toLowerCase().startsWith(this.query.toLowerCase())) {
@@ -44,12 +33,16 @@ export default {
       return classes
     },
     wordPressed (word) {
-      this.wordSelected(word.word)
+      this.wordSelected(word.word === this.selectedWord ? undefined : word.word)
     },
     applySelection () {
       const skip = [' ', ', ', '; ', '\n']
       this.words.every(w => {
         if (skip.includes(w.word)) {
+          return true
+        }
+        if (this.selectedWord === undefined) {
+          w.status = ''
           return true
         }
 
@@ -71,6 +64,9 @@ export default {
         return true
       })
 
+      if (this.translation === 'ESV') { this.fetchSynonyms() }
+    },
+    fetchSynonyms () {
       const self = this
       synonymService.fetchSynonyms(this.selectedWord)
       .then(synonyms => {
@@ -86,6 +82,9 @@ export default {
 }
 
 function clean (word) {
+  if (word === undefined) {
+    return word
+  }
   return word.toLowerCase().replace(/[,."?;:]/g, '')
 }
 </script>

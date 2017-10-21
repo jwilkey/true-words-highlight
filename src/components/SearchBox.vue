@@ -5,9 +5,25 @@
     </div>
 
     <form @submit.prevent="search">
-      <input v-model="passageQuery" placeholder="Search Bible passages" class="hi-bottom" autofocus />
-      <button class="callout-light" @click.prevent="search" :disabled="!passageQuery">search</button>
-      <button class="callout-light alt" v-if="passage" @click.prevent="onDone">cancel</button>
+      <input v-if="isESV" v-model="passageQuery" placeholder="Search Bible passages" class="hi-bottom" autofocus />
+
+      <select v-if="isEPT" v-model="bookId">
+        <option v-for="book in eptBooks" :value="book[0]">{{book[1]}}</option>
+      </select>
+
+      <div v-if="isEPT">
+
+      </div>
+
+      <div class="flex-row">
+        <select v-model="translation">
+          <option>ESV</option>
+          <option value="EPT">EPT - Ancient Greek</option>
+        </select>
+        <div class="flex-one"></div>
+        <button class="callout-light alt" v-if="passage" @click.prevent="onDone">cancel</button>
+        <button class="callout-light" @click.prevent="search" :disabled="isDisabled">{{searchButtonText}}</button>
+      </div>
     </form>
   </div>
 </template>
@@ -15,26 +31,68 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import axios from 'axios'
+import dbtService from '../services/dbt_service'
 
 export default {
   name: 'search-box',
   data () {
     return {
       passageQuery: '',
+      translation: 'ESV',
+      bookId: 'Matt',
       loading: false
     }
   },
   props: ['onDone'],
+  watch: {
+    translation (value) {
+      this.setTranslation(value)
+    }
+  },
   computed: {
-    ...mapGetters(['passage'])
+    ...mapGetters({passage: 'passage', storeTranslation: 'translation'}),
+    searchButtonText () {
+      return this.isEPT ? 'go' : 'search'
+    },
+    isESV () {
+      return this.translation === 'ESV'
+    },
+    isEPT () {
+      return this.translation === 'EPT'
+    },
+    isDisabled () {
+      return this.translation === 'ESV'
+      ? !this.passageQuery
+      : !this.bookId
+    },
+    eptBooks () {
+      return dbtService.books()
+    }
   },
   methods: {
-    ...mapActions(['setPassage', 'setText']),
+    ...mapActions(['setPassage', 'setWords', 'setTranslation']),
     search () {
       this.loading = true
       const self = this
+      if (this.translation === 'ESV') {
+        this.searchESV()
+        .then(words => {
+          self.setWords(words)
+          self.onDone()
+        })
+      } else {
+        dbtService.fetch(this.bookId)
+        .then(words => {
+          self.setPassage(self.bookId)
+          self.setWords(words)
+          self.onDone()
+        })
+      }
+    },
+    searchESV () {
+      const self = this
       const url = `https://bible.truewordsapp.com/search/${this.passageQuery}`
-      axios.get(url, {headers: {'x-esv-api-key': window.esv}})
+      return axios.get(url, {headers: {'x-esv-api-key': window.esv}})
       .then(function (response) {
         self.loading = false
         self.passageQuery = ''
@@ -45,16 +103,22 @@ export default {
           const chapter = v.number === 1 ? `\n[${v.chapter}:` : '['
           return `${chapter}${v.number}] ${text}`
         }).join(' ')
-        self.setText(text)
-
-        self.onDone()
+        const words = text.split(/([^a-zA-Z\n]+)/g).map(word => {
+          return word === '\n'
+          ? {word, status: 'break'}
+          : {word, status: ''}
+        })
+        return words
       })
     }
   },
   mounted () {
-    this.$nextTick(() => {
-      this.$el.querySelector('#searcher input').focus()
-    })
+    this.translation = this.storeTranslation
+    if (this.translation !== 'EPT') {
+      this.$nextTick(() => {
+        this.$el.querySelector('#searcher input').focus()
+      })
+    }
   }
 }
 </script>
@@ -64,10 +128,12 @@ export default {
 
 .search-box {
   position: relative;
+  select {
+    margin-top: 15px;
+  }
   button {
     margin-top: 15px;
     margin-left: 15px;
-    float: right;
     &:disabled {
       opacity: 0.4;
       cursor: not-allowed;

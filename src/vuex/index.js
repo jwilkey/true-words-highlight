@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export const state = {
+  translation: 'ESV',
   passage: '',
   text: '',
   words: [],
@@ -12,6 +13,7 @@ export const state = {
 }
 
 export const getters = {
+  translation: state => state.translation,
   passage: state => state.passage,
   text: state => state.text,
   words: state => state.words,
@@ -20,6 +22,9 @@ export const getters = {
 }
 
 export const actions = {
+  setTranslation ({ commit }, translation) {
+    commit('SET_TRANSLATION', translation)
+  },
   setPassage ({ commit }, passage) {
     commit('SET_PASSAGE', passage)
   },
@@ -31,7 +36,7 @@ export const actions = {
 
     var wordCounts = {}
     words.reduce((counts, word) => {
-      if (word.word.match(/[a-zA-Z]/)) {
+      if (word.word && !word.word.match(/[\s.'0-9]/)) {
         wordCounts[word.word] = (wordCounts[word.word] || 0) + 1
       }
     }, {})
@@ -45,6 +50,9 @@ export const actions = {
 }
 
 export const mutations = {
+  SET_TRANSLATION (state, translation) {
+    state.translation = translation
+  },
   SET_PASSAGE (state, passage) {
     state.passage = passage
   },
