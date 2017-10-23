@@ -103,7 +103,7 @@ export default {
         self.setPassage(response.data.passage.reference)
 
         const text = response.data.passage.verses.map(v => {
-          const text = v.text.replace(/<f>.*<\/f>/g, '')
+          const text = v.text.replace(/<f>.?<\/f>/g, '')
           const chapter = v.number === 1 ? `\n[${v.chapter}:` : '['
           return `${chapter}${v.number}] ${text}`
         }).join(' ')
