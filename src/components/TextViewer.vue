@@ -27,14 +27,28 @@
       <div class="flex-one substance relative">
         <highlighter ref="highlighter" :query="textQuery"></highlighter>
         <transition name="slide">
-          <div v-if="mode === 'word-counts'" class="right-menu shadow-long">
-            <word-count class="scrolly"></word-count>
+          <div v-if="mode === 'word-counts'" class="right-menu flex-column shadow-long">
+            <div v-if="hasNlp" class="theme-mid hi-bottom focus-buttons">
+              <div class="flex-row">
+                <button class="flex-one" :class="focusBtnClass('deity')" @click="setFocused('deity')">God</button>
+                <button class="flex-one" :class="focusBtnClass('keywords')" @click="setFocused('keywords')">Keywords</button>
+              </div>
+              <div class="flex-row">
+                <button class="flex-one" :class="focusBtnClass('people')" @click="setFocused('people')">People</button>
+                <button class="flex-one" :class="focusBtnClass('nouns')" @click="setFocused('nouns')">Nouns</button>
+              </div>
+              <div class="flex-row">
+                <button class="flex-one" :class="focusBtnClass('verbs')" @click="setFocused('verbs')">Verbs</button>
+                <button class="flex-one" :class="focusBtnClass('adjectives')" @click="setFocused('adjectives')">Adjectives</button>
+              </div>
+            </div>
+            <word-count class="flex-one scrolly"></word-count>
             <div class="fade-away"></div>
           </div>
         </transition>
 
         <div v-if="selectedWord" class="bottom-display theme-mid shadow-top">
-          <span class="count">{{ wordCount }}</span> <span class="blue">{{ cleanWord }}</span>
+          <span class="count">{{ wordCount }}</span> <span class="blue">{{ selectedWord }}</span>
         </div>
       </div>
     </div>
@@ -45,7 +59,7 @@
 import SearchBox from './SearchBox'
 import Highlighter from './Highlighter'
 import WordCount from './WordCount'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'text-viewer',
@@ -54,21 +68,23 @@ export default {
       textQuery: '',
       searchingPassage: true,
       mode: undefined,
-      loading: false
+      loading: false,
+      focusedMode: ''
     }
   },
   computed: {
-    ...mapGetters(['passage', 'text', 'selectedWord', 'wordCounts']),
-    cleanWord () {
-      return clean(this.selectedWord)
-    },
+    ...mapGetters(['passage', 'text', 'selectedWord', 'wordCounts', 'nlp']),
     wordCount () {
       const count = [...this.wordCounts].find(wc => wc[0] === this.selectedWord)
       return count ? count[1] : undefined
+    },
+    hasNlp () {
+      return this.nlp !== undefined
     }
   },
   components: { SearchBox, Highlighter, WordCount },
   methods: {
+    ...mapActions(['setFocusedIds']),
     startSearch () {
       this.searchingPassage = true
     },
@@ -101,16 +117,44 @@ export default {
       const fontSize = getFontSize(this.$refs.highlighter.$el)
       const newFontSize = fontSize === 40 ? 40 : fontSize + 1
       highlighter.style.fontSize = `${newFontSize}px`
+    },
+    focusBtnClass (type) {
+      return type === this.focusedMode ? 'callout' : 'callout-light'
+    },
+    setFocused (type) {
+      if (type === this.focusedMode) {
+        this.focusedMode = ''
+        this.setFocusedIds([])
+      } else {
+        this.focusedMode = type
+        switch (type) {
+          case 'deity': this.focusSubset(this.nlp.match(`(spirit|jesus|christ|god|god's|lord|son)`))
+            break
+          case 'keywords': this.focusSubset(this.nlp.match('(faith|believe|hope|love|justice|righteous|righteousness|death|sin|true|truth|good|evil|wrong)'))
+            break
+          case 'people': this.focusSubset(this.nlp.people())
+            break
+          case 'nouns': this.focusSubset(this.nlp.nouns())
+            break
+          case 'adjectives': this.focusSubset(this.nlp.adjectives())
+            break
+          case 'verbs': this.focusSubset(this.nlp.verbs())
+            break
+          default:
+        }
+      }
+      this.mode = undefined
+    },
+    focusSubset (subset) {
+      var ids = []
+      subset.list.forEach(item => {
+        ids.push(...item.terms.map(term => term.uid))
+      })
+      this.setFocusedIds(ids)
     }
   }
 }
 
-function clean (word) {
-  if (word === undefined) {
-    return word
-  }
-  return word.toLowerCase().replace(/[,."?;:]/g, '')
-}
 function getFontSize (element) {
   return parseInt(window.getComputedStyle(element, null).getPropertyValue('font-size'))
 }
@@ -184,6 +228,13 @@ function getFontSize (element) {
   top: 75px;
   bottom: 40px;
   z-index: 1000;
+  .focus-buttons {
+    button {
+      font-size: 13px;
+      margin: 2px;
+      outline: none;
+    }
+  }
   .word-count {
     height: 100%;
   }

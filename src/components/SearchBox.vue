@@ -32,6 +32,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import axios from 'axios'
 import dbtService from '../services/dbt_service'
+import nlp from 'compromise'
 
 export default {
   name: 'search-box',
@@ -70,9 +71,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setPassage', 'setWords', 'setTranslation']),
+    ...mapActions(['setPassage', 'setWords', 'setTranslation', 'setNlp']),
     search () {
       this.loading = true
+      this.setNlp(undefined)
       const self = this
       if (this.translation === 'ESV') {
         this.searchESV()
@@ -89,7 +91,8 @@ export default {
         }, this.onFail)
       }
     },
-    onFail () {
+    onFail (error) {
+      console.log(error)
       this.loading = false
       this.alert('There was a loading error. Check your network connection and try again.')
     },
@@ -102,16 +105,36 @@ export default {
         self.passageQuery = ''
         self.setPassage(response.data.passage.reference)
 
-        const text = response.data.passage.verses.map(v => {
-          const text = v.text.replace(/<f>.?<\/f>/g, '')
-          const chapter = v.number === 1 ? `\n[${v.chapter}:` : '['
-          return `${chapter}${v.number}] ${text}`
-        }).join(' ')
-        const words = text.split(/([^a-zA-Z\n]+)/g).map(word => {
-          return word === '\n'
-          ? {word, status: 'break'}
-          : {word, status: ''}
+        var text = response.data.passage.verses.map(v => {
+          var meta = v.number === 1 ? `(LINEBREAK) (${v.chapter}:${v.number})` : `(${v.number})`
+          return `${meta} ${v.text.replace(/<f>\d*<\/f>/g, '')}`
         })
+
+        var doc = nlp(text)
+        self.setNlp(doc)
+        var words = []
+
+        doc.terms().list.forEach(outerTerm => {
+          outerTerm.terms.forEach((term, index) => {
+            if (term.text === '(LINEBREAK)') {
+              words.push({word: '', meta: 'linebreak'})
+            } else if (term.text.match(/\(\d*:?\d*\)/)) {
+              words.push({word: term.text.replace(/[()]/g, ''), meta: 'muted'})
+            } else {
+              if (term.whitespace.before) {
+                words.push({word: ' ', meta: 'space', id: term.uid})
+              }
+              term.text.split(/([^a-zA-Z\n']+)/g).forEach(t => {
+                const isWord = t.match(/[a-zA-Z]/) !== null
+                words.push({word: t, root: term.root, status: '', id: isWord ? term.uid : undefined, meta: isWord ? undefined : 'punctuation'})
+              })
+              if (term.whitespace.after) {
+                words.push({word: ' ', meta: 'space', id: term.uid})
+              }
+            }
+          })
+        })
+
         return words
       })
     }

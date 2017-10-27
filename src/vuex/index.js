@@ -10,7 +10,9 @@ export const state = {
   text: '',
   words: [],
   wordCounts: {},
-  selectedWord: undefined
+  selectedWord: undefined,
+  nlp: undefined,
+  focusedIds: []
 }
 
 export const getters = {
@@ -20,7 +22,9 @@ export const getters = {
   text: state => state.text,
   words: state => state.words,
   wordCounts: state => state.wordCounts,
-  selectedWord: state => state.selectedWord
+  selectedWord: state => state.selectedWord,
+  nlp: state => state.nlp,
+  focusedIds: state => state.focusedIds
 }
 
 export const actions = {
@@ -51,6 +55,12 @@ export const actions = {
   },
   wordSelected ({ commit }, word) {
     commit('SET_SELECTED_WORD', word)
+  },
+  setNlp ({ commit }, nlp) {
+    commit('SET_NLP', nlp)
+  },
+  setFocusedIds ({ commit }, ids) {
+    commit('SET_FOCUSED_IDS', ids)
   }
 }
 
@@ -75,6 +85,12 @@ export const mutations = {
   },
   SET_SELECTED_WORD (state, word) {
     state.selectedWord = word
+  },
+  SET_NLP (state, nlp) {
+    state.nlp = nlp
+  },
+  SET_FOCUSED_IDS (state, ids) {
+    state.focusedIds = ids
   }
 }
 

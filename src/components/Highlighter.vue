@@ -21,19 +21,27 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['words', 'selectedWord', 'translation'])
+    ...mapGetters(['words', 'selectedWord', 'focusedIds', 'translation'])
   },
   methods: {
     ...mapActions(['setWords', 'wordSelected']),
     wordClasses (word) {
       var classes = [word.status]
+      if (word.meta) {
+        classes.push(word.meta)
+      }
       if (this.query && word.word.toLowerCase().startsWith(this.query.toLowerCase())) {
         classes.push('highlighted')
+      }
+      if (this.focusedIds.includes(word.id)) {
+        classes.push('focused')
       }
       return classes
     },
     wordPressed (word) {
-      this.wordSelected(word.word === this.selectedWord ? undefined : word.word)
+      if (!word.meta) {
+        this.wordSelected(word.word === this.selectedWord ? undefined : word.word)
+      }
     },
     applySelection () {
       const skip = [' ', ', ', '; ', '\n']
@@ -46,8 +54,8 @@ export default {
           return true
         }
 
-        var w1 = clean(w.word)
-        var w2 = clean(this.selectedWord)
+        var w1 = w.word
+        var w2 = this.selectedWord
         if (w1 === w2) {
           w.status = 'match'
         } else {
@@ -101,9 +109,9 @@ function clean (word) {
     border: solid 1px transparent;
     word-spacing: -1px;
   }
-  .break {
+  .linebreak {
     display: block;
-    margin-top: 5px;
+    margin-top: 10px;
   }
   .synonym {
     text-shadow: 1px 0px 3px black;
@@ -131,6 +139,11 @@ function clean (word) {
   .highlighted:not(.match):not(.match-4) {
     border-color: @color-highlight-orange;
     background: fade(@color-highlight-orange, 40%);
+  }
+  .focused:not(.match):not(.match-4) {
+    border-radius: 0;
+    border-bottom-color: @color-highlight-green;
+    background-color: fade(@color-highlight-green, 50%);
   }
 }
 </style>
