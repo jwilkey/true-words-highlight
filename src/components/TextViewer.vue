@@ -224,6 +224,7 @@ function getFontSize (element) {
 }
 .right-menu {
   position: fixed;
+  min-width: 200px;
   right: 0;
   top: 75px;
   bottom: 40px;
