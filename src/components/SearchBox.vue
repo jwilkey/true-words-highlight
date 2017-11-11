@@ -71,7 +71,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setPassage', 'setWords', 'setTranslation', 'setNlp']),
+    ...mapActions(['setPassage', 'setWords', 'setTranslation', 'setNlp', 'setCopyright']),
     search () {
       this.loading = true
       this.setNlp(undefined)
@@ -104,6 +104,7 @@ export default {
         self.loading = false
         self.passageQuery = ''
         self.setPassage(response.data.passage.reference)
+        self.setCopyright(response.data.copyright)
 
         var text = response.data.passage.verses.map(v => {
           var meta = v.number === 1 ? `(LINEBREAK) (${v.chapter}:${v.number})` : `(${v.number})`

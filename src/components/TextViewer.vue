@@ -26,6 +26,7 @@
 
       <div class="flex-one substance relative">
         <highlighter ref="highlighter" :query="textQuery"></highlighter>
+        <p class="copyright muted hi-top">{{copyright}}</p>
         <transition name="slide">
           <div v-if="mode === 'word-counts'" class="right-menu flex-column shadow-long">
             <div v-if="hasNlp" class="theme-mid hi-bottom focus-buttons">
@@ -73,7 +74,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['passage', 'text', 'selectedWord', 'wordCounts', 'nlp']),
+    ...mapGetters(['passage', 'text', 'selectedWord', 'wordCounts', 'nlp', 'copyright']),
     wordCount () {
       const count = [...this.wordCounts].find(wc => wc[0] === this.selectedWord)
       return count ? count[1] : undefined
@@ -213,6 +214,9 @@ function getFontSize (element) {
   .substance {
     overflow-x: hidden;
   }
+}
+.copyright {
+  padding: 20px;
 }
 .text-search {
   i {

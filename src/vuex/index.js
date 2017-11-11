@@ -7,6 +7,7 @@ export const state = {
   alertMessage: '',
   translation: 'ESV',
   passage: '',
+  copyright: '',
   text: '',
   words: [],
   wordCounts: {},
@@ -19,6 +20,7 @@ export const getters = {
   alertMessage: state => state.alertMessage,
   translation: state => state.translation,
   passage: state => state.passage,
+  copyright: state => state.copyright,
   text: state => state.text,
   words: state => state.words,
   wordCounts: state => state.wordCounts,
@@ -36,6 +38,9 @@ export const actions = {
   },
   setPassage ({ commit }, passage) {
     commit('SET_PASSAGE', passage)
+  },
+  setCopyright ({ commit }, copyright) {
+    commit('SET_COPYRIGHT', copyright)
   },
   setText ({ commit }, text) {
     commit('SET_TEXT', text)
@@ -73,6 +78,9 @@ export const mutations = {
   },
   SET_PASSAGE (state, passage) {
     state.passage = passage
+  },
+  SET_COPYRIGHT (state, copyright) {
+    state.copyright = copyright
   },
   SET_TEXT (state, text) {
     state.text = text
