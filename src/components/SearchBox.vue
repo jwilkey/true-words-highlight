@@ -5,8 +5,9 @@
     </div>
 
     <form @submit.prevent="search">
-      <div class="flex-row">
+      <div class="flex-row align-center">
         <input v-if="isESV" v-model="passageQuery" placeholder="Search Bible passages" class="hi-bottom flex-one" autofocus />
+        <button type="button" class="muted hi-bottom hi-right marginr" @click="passageQuery = ''"><i class="fa fa-close"></i></button>
 
         <select v-model="translation">
           <option>ESV</option>
@@ -18,7 +19,7 @@
         <option v-for="book in eptBooks" :value="book[0]">{{book[1]}}</option>
       </select>
 
-      <div class="flex-row">
+      <div class="flex-row pad">
         <button type="button" class="callout-light alt" v-if="passage" @click.prevent="onDone">cancel</button>
 
         <button v-if="showQueryButton" type="submit" class="flex-one back-orange" @click.prevent="loadQuery">Search the Bible</button>
@@ -26,10 +27,6 @@
         <button v-if="searchButtonText" type="submit" class="flex-one callout-light" @click.prevent="loadPassage">{{searchButtonText}}</button>
       </div>
     </form>
-
-    <!-- <div class="center-box blur">
-      <translations class="shadow-long"></translations>
-    </div> -->
   </div>
 </template>
 
@@ -37,9 +34,10 @@
 import Translations from './Translations'
 import { mapGetters, mapActions } from 'vuex'
 import dbtService from '../services/dbt_service'
+import bible from '../helpers/bible'
 import bibleApi from '../services/bible-api'
 import nlp from 'compromise'
-import osisNames from '../../static/json/osis.json'
+import nlprocessor from '../helpers/nlprocessor'
 
 import parser from 'bible-passage-reference-parser/js/en_bcv_parser'
 var bcv = new parser.bcv_parser()  // eslint-disable-line new-cap
@@ -69,8 +67,10 @@ export default {
       return bcv.parse(this.passageQuery).osis()
     },
     searchButtonText () {
-      if (this.osis) {
-        return `Read ${readableOsis(this.osis)}`
+      if (this.isESV && this.osis) {
+        return `Read ${bible.readableOsis(this.osis)}`
+      } else if (this.isEPT) {
+        return 'Read'
       }
       return undefined
     },
@@ -117,53 +117,27 @@ export default {
       }
     },
     loadQuery () {
-      window.location = `https://search.truewordsapp.com/#/?q=${this.passageQuery}`
+      const url = `https://search.truewordsapp.com/#/?q=${this.passageQuery}`
+      var win = window.open(url, '_blank')
+      win.focus()
     },
     onFail (error) {
       console.log(error)
       this.loading = false
-      this.alert('There was a loading error. Check your network connection and try again.')
+      this.alert('There was a error.')
     },
     searchESV () {
       const self = this
       return bibleApi.searchEsv(this.passageQuery)
-      .then(response => {
+      .then(result => {
         self.loading = false
         self.passageQuery = ''
-        self.setPassage(response.data.passage.reference)
-        self.setCopyright(response.data.copyright)
+        self.setPassage(result.reference)
+        self.setCopyright(result.copyright)
 
-        var text = response.data.passage.verses.map(v => {
-          var meta = v.number === 1 ? `(LINEBREAK) (${v.chapter}:${v.number})` : `(${v.number})`
-          return `${meta} ${v.text.replace(/<f>\d*<\/f>/g, '')}`
-        })
-
-        var doc = nlp(text)
-        self.setNlp(doc)
-        var words = []
-
-        doc.terms().list.forEach(outerTerm => {
-          outerTerm.terms.forEach((term, index) => {
-            if (term.text === '(LINEBREAK)') {
-              words.push({word: '', meta: 'linebreak'})
-            } else if (term.text.match(/\(\d*:?\d*\)/)) {
-              words.push({word: term.text.replace(/[()]/g, ''), meta: 'muted'})
-            } else {
-              if (term.whitespace.before) {
-                words.push({word: ' ', meta: 'space', id: term.uid})
-              }
-              term.text.split(/([^a-zA-Z\n']+)/g).forEach(t => {
-                const isWord = t.match(/[a-zA-Z]/) !== null
-                words.push({word: t, root: term.root, status: '', id: isWord ? term.uid : undefined, meta: isWord ? undefined : 'punctuation'})
-              })
-              if (term.whitespace.after) {
-                words.push({word: ' ', meta: 'space', id: term.uid})
-              }
-            }
-          })
-        })
-
-        return words
+        var nlpDoc = nlp(result.text)
+        self.setNlp(nlpDoc)
+        return nlprocessor.extractWords(nlpDoc)
       })
     }
   },
@@ -177,24 +151,6 @@ export default {
     }
   }
 }
-
-function readableOsis (osis) {
-  const refs = osis.split(',')
-
-  const range = refs[0].split('-')
-  const start = range[0].split('.')
-
-  const l1 = start.length
-  const startRef = `${osisNames[start[0]]} ${start[1]}${l1 > 2 ? ':' + start[2] : ''}`
-  var endRef = ''
-  if (range[1]) {
-    const end = range[1].split('.')
-    const l2 = end.length
-    endRef = `-${end[1]}${l2 > 2 ? ':' + end[2] : ''}`
-  }
-
-  return `${startRef}${endRef}`
-}
 </script>
 
 <style lang="less" scoped>
@@ -202,12 +158,11 @@ function readableOsis (osis) {
 
 .search-box {
   position: relative;
-  input {
-    margin-right: 10px;
-  }
   button {
-    margin-top: 15px;
-    margin-left: 15px;
+    &[type="button"] {
+      background-color: transparent;
+      border-radius: 0;
+    }
     &:disabled {
       opacity: 0.4;
       cursor: not-allowed;
