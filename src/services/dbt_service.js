@@ -11,7 +11,7 @@ export default {
     return books.find(b => b.book_id === bookId).chapters.split(',')
   },
   fetch (bookId, chapter) {
-    const base = 'http://dbt.io/text/verse'
+    const base = 'https://dbt.io/text/verse'
     const key = '35e9e596933f2fe297b2c5ad0632d484'
     const url = `${base}?dam_id=GRKEPTN1ET&book_id=${bookId}&v=2&key=${key}`
 

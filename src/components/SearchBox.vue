@@ -5,34 +5,46 @@
     </div>
 
     <form @submit.prevent="search">
-      <input v-if="isESV" v-model="passageQuery" placeholder="Search Bible passages" class="hi-bottom" autofocus />
+      <div class="flex-row">
+        <input v-if="isESV" v-model="passageQuery" placeholder="Search Bible passages" class="hi-bottom flex-one" autofocus />
+
+        <select v-model="translation">
+          <option>ESV</option>
+          <option value="EPT">EPT - Ancient Greek</option>
+        </select>
+      </div>
 
       <select v-if="isEPT" v-model="bookId">
         <option v-for="book in eptBooks" :value="book[0]">{{book[1]}}</option>
       </select>
 
-      <div v-if="isEPT">
-
-      </div>
-
       <div class="flex-row">
-        <select v-model="translation">
-          <option>ESV</option>
-          <option value="EPT">EPT - Ancient Greek</option>
-        </select>
-        <div class="flex-one"></div>
         <button type="button" class="callout-light alt" v-if="passage" @click.prevent="onDone">cancel</button>
-        <button type="submit" class="callout-light" @click.prevent="search" :disabled="isDisabled">{{searchButtonText}}</button>
+
+        <button v-if="showQueryButton" type="submit" class="flex-one back-orange" @click.prevent="loadQuery">Search the Bible</button>
+
+        <button v-if="searchButtonText" type="submit" class="flex-one callout-light" @click.prevent="loadPassage">{{searchButtonText}}</button>
       </div>
     </form>
+
+    <!-- <div class="center-box blur">
+      <translations class="shadow-long"></translations>
+    </div> -->
   </div>
 </template>
 
 <script>
+import Translations from './Translations'
 import { mapGetters, mapActions } from 'vuex'
-import axios from 'axios'
 import dbtService from '../services/dbt_service'
+import bibleApi from '../services/bible-api'
 import nlp from 'compromise'
+import osisNames from '../../static/json/osis.json'
+
+import parser from 'bible-passage-reference-parser/js/en_bcv_parser'
+var bcv = new parser.bcv_parser()  // eslint-disable-line new-cap
+bcv.options.book_alone_strategy = 'first_chapter'
+bcv.options.book_sequence_strategy = 'include'
 
 export default {
   name: 'search-box',
@@ -50,10 +62,20 @@ export default {
       this.setTranslation(value)
     }
   },
+  components: { Translations },
   computed: {
     ...mapGetters({passage: 'passage', storeTranslation: 'translation'}),
+    osis () {
+      return bcv.parse(this.passageQuery).osis()
+    },
     searchButtonText () {
-      return this.isEPT ? 'go' : 'search'
+      if (this.osis) {
+        return `Read ${readableOsis(this.osis)}`
+      }
+      return undefined
+    },
+    showQueryButton () {
+      return this.passageQuery && (!this.osis || !this.passageQuery.match(/\d/))
     },
     isESV () {
       return this.translation === 'ESV'
@@ -73,6 +95,9 @@ export default {
   methods: {
     ...mapActions(['setPassage', 'setWords', 'setTranslation', 'setNlp', 'setCopyright']),
     search () {
+      this.showQueryButton ? this.loadQuery() : this.loadPassage()
+    },
+    loadPassage () {
       this.loading = true
       this.setNlp(undefined)
       const self = this
@@ -91,6 +116,9 @@ export default {
         }, this.onFail)
       }
     },
+    loadQuery () {
+      window.location = `https://search.truewordsapp.com/#/?q=${this.passageQuery}`
+    },
     onFail (error) {
       console.log(error)
       this.loading = false
@@ -98,11 +126,11 @@ export default {
     },
     searchESV () {
       const self = this
-      const url = `https://bible.truewordsapp.com/search/${this.passageQuery}`
-      return axios.get(url, {headers: {'x-esv-api-key': window.esv}})
-      .then(function (response) {
+      return bibleApi.searchEsv(this.passageQuery)
+      .then(response => {
         self.loading = false
         self.passageQuery = ''
+        debugger
         self.setPassage(response.data.passage.reference)
         self.setCopyright(response.data.copyright)
 
@@ -141,6 +169,7 @@ export default {
     }
   },
   mounted () {
+    this.passageQuery = this.passage
     this.translation = this.storeTranslation
     if (this.translation !== 'EPT') {
       this.$nextTick(() => {
@@ -149,6 +178,24 @@ export default {
     }
   }
 }
+
+function readableOsis (osis) {
+  const refs = osis.split(',')
+
+  const range = refs[0].split('-')
+  const start = range[0].split('.')
+
+  const l1 = start.length
+  const startRef = `${osisNames[start[0]]} ${start[1]}${l1 > 2 ? ':' + start[2] : ''}`
+  var endRef = ''
+  if (range[1]) {
+    const end = range[1].split('.')
+    const l2 = end.length
+    endRef = `-${end[1]}${l2 > 2 ? ':' + end[2] : ''}`
+  }
+
+  return `${startRef}${endRef}`
+}
 </script>
 
 <style lang="less" scoped>
@@ -156,8 +203,8 @@ export default {
 
 .search-box {
   position: relative;
-  select {
-    margin-top: 15px;
+  input {
+    margin-right: 10px;
   }
   button {
     margin-top: 15px;
