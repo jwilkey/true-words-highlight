@@ -148,3 +148,28 @@ input {
     stroke: @color-highlight-red;
   }
 }
+
+.center-box {
+  position: fixed;
+  top: 50%;
+  bottom: 0;
+  left: 50%;
+  overflow: visible;
+  z-index: 100;
+  & > * {
+    transform: translateX(-50%) translateY(-50%);
+  }
+  &.blur::before {
+    content: '';
+    background-image: url('/static/images/tile.jpg');
+    font-size: 20px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.6;
+    filter: blur(10px);
+    z-index: 0;
+  }
+}
