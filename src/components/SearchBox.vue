@@ -130,7 +130,6 @@ export default {
       .then(response => {
         self.loading = false
         self.passageQuery = ''
-        debugger
         self.setPassage(response.data.passage.reference)
         self.setCopyright(response.data.copyright)
 
