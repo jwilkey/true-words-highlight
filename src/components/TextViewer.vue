@@ -25,10 +25,13 @@
       </div>
 
       <div class="flex-one substance relative">
-        <highlighter ref="highlighter" :query="textQuery"></highlighter>
+        <highlighter ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta"></highlighter>
         <p class="copyright muted hi-top">{{copyright}}</p>
         <transition name="slide">
           <div v-if="mode === 'word-counts'" class="right-menu flex-column shadow-long">
+            <div class="theme-mid small-pad hi-bottom flex-row">
+              <button class="callout-light hfull flex-one" @click="toggleVerses">{{ shouldHideMeta ? 'Show' : 'Hide'}} verses</button>
+            </div>
             <div v-if="hasNlp" class="theme-mid hi-bottom focus-buttons">
               <div class="flex-row">
                 <button class="flex-one" :class="focusBtnClass('deity')" @click="setFocused('deity')">God</button>
@@ -70,7 +73,8 @@ export default {
       searchingPassage: true,
       mode: undefined,
       loading: false,
-      focusedMode: ''
+      focusedMode: '',
+      shouldHideMeta: false
     }
   },
   computed: {
@@ -99,6 +103,9 @@ export default {
           this.$el.querySelector('#menubar input').focus()
         })
       }
+    },
+    toggleVerses () {
+      this.shouldHideMeta = !this.shouldHideMeta
     },
     clearTextQuery () {
       this.textQuery = ''

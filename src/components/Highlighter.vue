@@ -14,7 +14,7 @@ export default {
     return {
     }
   },
-  props: ['query'],
+  props: ['query', 'hideMeta'],
   watch: {
     selectedWord () {
       this.applySelection()
@@ -28,7 +28,7 @@ export default {
     wordClasses (word) {
       var classes = [word.status]
       if (word.meta) {
-        classes.push(word.meta)
+        this.hideMeta && word.meta === 'muted' ? classes.push('hidden') : classes.push(word.meta)
       }
       if (this.query && word.word.toLowerCase().startsWith(this.query.toLowerCase())) {
         classes.push('highlighted')
