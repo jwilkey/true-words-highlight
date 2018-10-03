@@ -2,7 +2,7 @@
   <div class="text-viewer theme-back">
     <search-box id="searcher" class="theme-mid shadow-long" v-if="searchingPassage" :on-done="searchComplete"></search-box>
 
-    <div id="content" class="flex-column" :class="{blur: searchingPassage || loading}">
+    <div id="content" v-if="hasWords" class="flex-column" :class="{blur: searchingPassage || loading}">
       <div id="menubar" v-if="passage" class="theme-mid shadow-long hi-bottom">
         <div class="flex-row align-center">
           <p class="passage shadow" @click="startSearch">{{passage}}</p>
@@ -78,7 +78,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['passage', 'text', 'selectedWord', 'wordCounts', 'nlp', 'copyright']),
+    ...mapGetters(['passage', 'words', 'text', 'selectedWord', 'wordCounts', 'nlp', 'copyright']),
+    hasWords () {
+      return this.words && this.words.length
+    },
     wordCount () {
       const count = [...this.wordCounts].find(wc => wc[0] === this.selectedWord)
       return count ? count[1] : undefined

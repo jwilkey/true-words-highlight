@@ -86,6 +86,14 @@ export default {
         })
       })
     }
+  },
+  mounted () {
+    if (this.$route.query.selection) {
+      this.wordSelected(this.$route.query.selection)
+      this.$nextTick(() => {
+        this.applySelection()
+      })
+    }
   }
 }
 

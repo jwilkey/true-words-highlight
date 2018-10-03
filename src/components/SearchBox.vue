@@ -147,6 +147,10 @@ export default {
     if (this.translation !== 'EPT') {
       this.$nextTick(() => {
         this.$el.querySelector('#searcher input').focus()
+        if (this.$route.query.passage) {
+          this.passageQuery = this.$route.query.passage
+          this.loadPassage()
+        }
       })
     }
   }
