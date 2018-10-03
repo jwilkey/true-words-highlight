@@ -149,6 +149,7 @@ export default {
         this.$el.querySelector('#searcher input').focus()
         if (this.$route.query.passage) {
           this.passageQuery = this.$route.query.passage
+          this.$route.query.passage = undefined
           this.loadPassage()
         }
       })
