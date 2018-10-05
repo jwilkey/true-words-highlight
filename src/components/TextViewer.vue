@@ -8,17 +8,14 @@
           <p class="passage shadow" @click="startSearch">{{passage}}</p>
           <div class="flex-one"></div>
           <div class="buttons">
-            <div class="zoom">
-              <i class="fa fa-minus shadow" @click.prevent="zoomOut"></i>
-              <i class="fa fa-plus shadow" @click.prevent="zoomIn"></i>
-            </div>
-            <i class="fa fa-file-text-o" :class="{active: mode === 'word-counts'}" @click="toggleWordCounts"></i>
             <i class="fa fa-search" :class="{active: mode === 'search'}" @click="toggleSearchText"></i>
+            <i class="fa fa-file-text-o" :class="{active: mode === 'word-counts'}" @click="toggleWordCounts"></i>
+            <i class="fa fa-gear" :class="{active: mode === 'settings'}" @click="toggleSettings"></i>
           </div>
         </div>
         <transition name="slide">
-          <div v-if="mode === 'search'" class="text-search flex-row align-center">
-            <input v-model="textQuery" placeholder="search text" />
+          <div v-if="mode === 'search'" class="text-search flex-row align-center margint">
+            <input v-model="textQuery" placeholder="search text" class="theme-mid" />
             <i @click="clearTextQuery" class="fa fa-close red"></i>
           </div>
         </transition>
@@ -28,27 +25,10 @@
         <highlighter ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta"></highlighter>
         <p class="copyright muted hi-top">{{copyright}}</p>
         <transition name="slide">
-          <div v-if="mode === 'word-counts'" class="right-menu flex-column shadow-long">
-            <div class="theme-mid small-pad hi-bottom flex-row">
-              <button class="callout-light hfull flex-one" @click="toggleVerses">{{ shouldHideMeta ? 'Show' : 'Hide'}} verses</button>
-            </div>
-            <div v-if="hasNlp" class="theme-mid hi-bottom focus-buttons">
-              <div class="flex-row">
-                <button class="flex-one" :class="focusBtnClass('deity')" @click="setFocused('deity')">God</button>
-                <button class="flex-one" :class="focusBtnClass('keywords')" @click="setFocused('keywords')">Keywords</button>
-              </div>
-              <div class="flex-row">
-                <button class="flex-one" :class="focusBtnClass('people')" @click="setFocused('people')">People</button>
-                <button class="flex-one" :class="focusBtnClass('nouns')" @click="setFocused('nouns')">Nouns</button>
-              </div>
-              <div class="flex-row">
-                <button class="flex-one" :class="focusBtnClass('verbs')" @click="setFocused('verbs')">Verbs</button>
-                <button class="flex-one" :class="focusBtnClass('adjectives')" @click="setFocused('adjectives')">Adjectives</button>
-              </div>
-            </div>
-            <word-count class="flex-one scrolly"></word-count>
-            <div class="fade-away"></div>
-          </div>
+          <words-menu v-if="mode === 'word-counts'" :focusBtnClass="focusBtnClass" :setFocused="setFocused" :hasNlp="hasNlp"></words-menu>
+        </transition>
+        <transition name="slide">
+          <settings v-if="mode === 'settings'" :zoomOut="zoomOut" :zoomIn="zoomIn" :toggleVerses="toggleVerses" :shouldHideMeta="shouldHideMeta"></settings>
         </transition>
 
         <div v-if="selectedWord" class="bottom-display theme-mid shadow-top">
@@ -62,7 +42,8 @@
 <script>
 import SearchBox from './SearchBox'
 import Highlighter from './Highlighter'
-import WordCount from './WordCount'
+import WordsMenu from '@/components/WordsMenu'
+import Settings from '@/components/Settings'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
@@ -90,7 +71,7 @@ export default {
       return this.nlp !== undefined
     }
   },
-  components: { SearchBox, Highlighter, WordCount },
+  components: { SearchBox, Highlighter, WordsMenu, Settings },
   methods: {
     ...mapActions(['setFocusedIds']),
     startSearch () {
@@ -116,6 +97,9 @@ export default {
     },
     toggleWordCounts () {
       this.mode = this.mode === 'word-counts' ? undefined : 'word-counts'
+    },
+    toggleSettings () {
+      this.mode = this.mode === 'settings' ? undefined : 'settings'
     },
     zoomOut () {
       const highlighter = this.$refs.highlighter.$el
@@ -175,8 +159,6 @@ function getFontSize (element) {
 @import "../../static/less/flex";
 @import "../../static/less/colors";
 
-.text-viewer {
-}
 #searcher {
   position: fixed;
   top: 20%;
@@ -235,32 +217,6 @@ function getFontSize (element) {
 }
 .relative {
   position: relative;
-}
-.right-menu {
-  position: fixed;
-  min-width: 200px;
-  right: 0;
-  top: 75px;
-  bottom: 40px;
-  z-index: 1000;
-  .focus-buttons {
-    button {
-      font-size: 13px;
-      margin: 2px;
-      outline: none;
-    }
-  }
-  .word-count {
-    height: 100%;
-  }
-  .fade-away {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 10px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
-  }
 }
 .bottom-display {
   position: fixed;
