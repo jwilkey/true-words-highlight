@@ -1,5 +1,5 @@
 <template>
-  <div class="right-menu flex-column shadow-long">
+  <div class="flex-column vfull">
     <div v-if="hasNlp" class="theme-mid hi-bottom focus-buttons">
       <div class="flex-row">
         <button class="flex-one" :class="focusBtnClass('deity')" @click="setFocused('deity')">God</button>
@@ -30,30 +30,22 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.right-menu {
-  position: fixed;
-  min-width: 200px;
+.focus-buttons {
+  button {
+    font-size: 13px;
+    margin: 2px;
+    outline: none;
+  }
+}
+.word-count {
+  height: 100%;
+}
+.fade-away {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   right: 0;
-  top: 75px;
-  bottom: 40px;
-  z-index: 1000;
-  .focus-buttons {
-    button {
-      font-size: 13px;
-      margin: 2px;
-      outline: none;
-    }
-  }
-  .word-count {
-    height: 100%;
-  }
-  .fade-away {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 10px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
-  }
+  height: 10px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
 }
 </style>

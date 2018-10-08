@@ -5,9 +5,16 @@
     </div>
 
     <form @submit.prevent="search">
-      <div class="flex-row align-center">
-        <input v-if="isESV" v-model="passageQuery" placeholder="Search Bible passages" class="hi-bottom flex-one" autofocus />
-        <button type="button" class="muted hi-bottom hi-right marginr" @click="passageQuery = ''"><i class="fa fa-close"></i></button>
+      <div class="flex-row align-center marginb">
+        <div class="flex-one">
+          <input v-if="isESV" v-model="passageQuery" placeholder="Search Bible passages" class="hi-bottom" autofocus />
+        </div>
+
+        <button type="button" class="muted hi-bottom hi-right" @click="passageQuery = ''"><i class="fa fa-close"></i></button>
+      </div>
+
+      <div class="flex-row marginb">
+        <div class="flex-one"></div>
 
         <select v-model="translation">
           <option>ESV</option>
@@ -22,7 +29,7 @@
       <div class="flex-row pad">
         <button type="button" class="callout-light alt" v-if="passage" @click.prevent="onDone">cancel</button>
 
-        <button v-if="showQueryButton" type="submit" class="flex-one back-orange" @click.prevent="loadQuery">Search the Bible</button>
+        <button v-if="showQueryButton" type="submit" class="flex-one back-orange marginr" @click.prevent="loadQuery">Search the Bible</button>
 
         <button v-if="searchButtonText" type="submit" class="flex-one callout-light" @click.prevent="loadPassage">{{searchButtonText}}</button>
       </div>

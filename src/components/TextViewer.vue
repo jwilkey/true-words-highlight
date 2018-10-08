@@ -21,18 +21,22 @@
         </transition>
       </div>
 
-      <div class="flex-one substance relative">
-        <highlighter ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta"></highlighter>
-        <p class="copyright muted hi-top">{{copyright}}</p>
-        <transition name="slide">
-          <words-menu v-if="mode === 'word-counts'" :focusBtnClass="focusBtnClass" :setFocused="setFocused" :hasNlp="hasNlp"></words-menu>
-        </transition>
-        <transition name="slide">
-          <settings v-if="mode === 'settings'" :zoomOut="zoomOut" :zoomIn="zoomIn" :toggleVerses="toggleVerses" :shouldHideMeta="shouldHideMeta"></settings>
-        </transition>
+      <div class="flex-one flex-row relative">
+        <div class="flex-one flex-column vfull">
+          <highlighter class="substance" ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta"></highlighter>
+          <p class="flex-one copyright muted hi-top">{{copyright}}</p>
+          <div v-if="selectedWord" class="theme-mid z2 small-pad shadow-top">
+            <span class="count">{{ wordCount }}</span> <span class="blue">{{ selectedWord }}</span>
+          </div>
+        </div>
 
-        <div v-if="selectedWord" class="bottom-display theme-mid shadow-top">
-          <span class="count">{{ wordCount }}</span> <span class="blue">{{ selectedWord }}</span>
+        <div class="right-menu">
+          <transition name="slide">
+            <div v-if="showMenu" class="right-menu-content vfull scrolly shadow-long">
+                <words-menu v-if="mode === 'word-counts'" :focusBtnClass="focusBtnClass" :setFocused="setFocused" :hasNlp="hasNlp"></words-menu>
+                <settings v-if="mode === 'settings'" :zoomOut="zoomOut" :zoomIn="zoomIn" :toggleVerses="toggleVerses" :shouldHideMeta="shouldHideMeta"></settings>
+            </div>
+          </transition>
         </div>
       </div>
     </div>
@@ -69,6 +73,9 @@ export default {
     },
     hasNlp () {
       return this.nlp !== undefined
+    },
+    showMenu () {
+      return this.mode !== undefined
     }
   },
   components: { SearchBox, Highlighter, WordsMenu, Settings },
@@ -218,21 +225,13 @@ function getFontSize (element) {
 .relative {
   position: relative;
 }
-.bottom-display {
-  position: fixed;
-  z-index: 900;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 6px;
-  .count {
-    padding: 1px 8px;
-    border-radius: 16px;
-    margin: 0 8px;
-    background-color: @color-highlight-blue;
-    color: white;
-    text-shadow: 1px 0px 3px black;
-  }
+.count {
+  padding: 1px 8px;
+  border-radius: 16px;
+  margin: 0 8px;
+  background-color: @color-highlight-blue;
+  color: white;
+  text-shadow: 1px 0px 3px black;
 }
 .blur {
   filter: blur(3px);
@@ -246,4 +245,26 @@ function getFontSize (element) {
 .slide-enter, .slide-leave-to /* .fade-leave-active below version 2.1.8 */ {
   transform: translateX(100%);
 }
+.right-menu {
+  position: relative;
+  max-width: 20%;
+  max-height: 100%;
+  padding-top: 10px;
+  z-index: 1000;
+  margin-left: 10px;
+  .right-menu-content {
+    min-width: 200px;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .right-menu {
+    position: fixed;
+    min-width: 200px;
+    padding: 0;
+    right: 0;
+    top: 75px;
+    bottom: 40px;
+  }
+}
+
 </style>

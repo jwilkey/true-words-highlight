@@ -1,5 +1,5 @@
 <template>
-  <div class="right-menu theme-mid small-pad flex-column shadow-long">
+  <div class="theme-mid small-pad flex-column">
     <p>Zoom text</p>
     <div class="zoom flex-row marginb">
       <button class="flex-one callout shadow marginr" @click.prevent="zoomOut"><i class="fa fa-minus"></i></button>
@@ -32,12 +32,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.right-menu {
-  position: fixed;
-  min-width: 200px;
-  right: 0;
-  top: 75px;
-  bottom: 40px;
-  z-index: 1000;
-}
 </style>
