@@ -23,8 +23,10 @@
 
       <div class="flex-one flex-row relative">
         <div class="flex-one flex-column vfull">
-          <highlighter class="substance" ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta"></highlighter>
-          <p class="flex-one copyright muted hi-top">{{copyright}}</p>
+          <div class="flex-one scrolly">
+            <highlighter ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta"></highlighter>
+            <p class="copyright muted hi-top">{{copyright}}</p>
+          </div>
           <div v-if="selectedWord" class="theme-mid z2 small-pad shadow-top">
             <span class="count">{{ wordCount }}</span> <span class="blue">{{ selectedWord }}</span>
           </div>
