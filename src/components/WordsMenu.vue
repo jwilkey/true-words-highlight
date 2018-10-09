@@ -15,7 +15,7 @@
       </div>
     </div>
     <word-count class="flex-one scrolly"></word-count>
-    <div class="fade-away"></div>
+    <div class="fade-away fade"></div>
   </div>
 </template>
 
@@ -46,6 +46,5 @@ export default {
   left: 0;
   right: 0;
   height: 10px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
 }
 </style>

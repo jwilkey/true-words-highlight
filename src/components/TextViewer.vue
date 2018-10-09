@@ -32,9 +32,9 @@
           </div>
         </div>
 
-        <div class="right-menu">
+        <div v-show="showMenu" class="right-menu">
           <transition name="slide">
-            <div v-if="showMenu" class="right-menu-content vfull scrolly shadow-long">
+            <div v-if="showMenu" class="right-menu-content vfull theme-mid scrolly shadow-long">
                 <words-menu v-if="mode === 'word-counts'" :focusBtnClass="focusBtnClass" :setFocused="setFocused" :hasNlp="hasNlp"></words-menu>
                 <settings v-if="mode === 'settings'" :zoomOut="zoomOut" :zoomIn="zoomIn" :toggleVerses="toggleVerses" :shouldHideMeta="shouldHideMeta"></settings>
             </div>
