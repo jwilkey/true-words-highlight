@@ -5,7 +5,7 @@
   "author": "Justin Wilkey <justin.wilkey@tentkeep.com>",
   "private": true,
   "scripts": {
-    "dev": "webpack-dashboard -- node build/dev-server.js",
+    "dev": "node build/dev-server.js",
     "start": "npm run dev",
     "build": "node build/build.js",
     "deploy": "gh-pages -d dist",

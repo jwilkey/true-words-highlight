@@ -14,7 +14,7 @@ export default {
     return {
     }
   },
-  props: ['query', 'hideMeta'],
+  props: ['query', 'hideMeta', 'breakVerses'],
   watch: {
     selectedWord () {
       this.applySelection()
@@ -28,7 +28,8 @@ export default {
     wordClasses (word) {
       var classes = [word.status]
       if (word.meta) {
-        this.hideMeta && word.meta === 'muted' ? classes.push('hidden') : classes.push(word.meta)
+        this.hideMeta && word.meta === 'verse-num' ? classes.push('hidden') : classes.push(word.meta)
+        this.breakVerses && word.meta === 'verse-num' ? classes.push('break') : classes.push(word.meta)
       }
       if (this.query && word.word.toLowerCase().startsWith(this.query.toLowerCase())) {
         classes.push('highlighted')
@@ -120,6 +121,13 @@ function clean (word) {
   .linebreak {
     display: block;
     margin-top: 10px;
+  }
+  .verse-num {
+    &.break::before {
+      content: '\A';
+      white-space: pre;
+    }
+    color: #999;
   }
   .synonym {
     text-shadow: 1px 0px 3px black;

@@ -21,10 +21,10 @@
         </transition>
       </div>
 
-      <div class="flex-one flex-row relative">
+      <div class="flex-one flex-row relative vfull">
         <div class="flex-one flex-column vfull">
           <div class="flex-one scrolly">
-            <highlighter ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta"></highlighter>
+            <highlighter ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta" :break-verses="shouldBreakVerses"></highlighter>
             <p class="copyright muted hi-top">{{copyright}}</p>
           </div>
           <div v-if="selectedWord" class="theme-mid z2 small-pad shadow-top">
@@ -36,7 +36,7 @@
           <transition name="slide">
             <div v-if="showMenu" class="right-menu-content vfull theme-mid scrolly shadow-long">
                 <words-menu v-if="mode === 'word-counts'" :focusBtnClass="focusBtnClass" :setFocused="setFocused" :hasNlp="hasNlp"></words-menu>
-                <settings v-if="mode === 'settings'" :zoomOut="zoomOut" :zoomIn="zoomIn" :toggleVerses="toggleVerses" :shouldHideMeta="shouldHideMeta"></settings>
+                <settings v-if="mode === 'settings'" :zoomOut="zoomOut" :zoomIn="zoomIn" :toggleVerses="toggleVerses" :shouldHideMeta="shouldHideMeta" :toggleVerseBreaks="toggleVerseBreaks" :shouldBreakVerses="shouldBreakVerses"></settings>
             </div>
           </transition>
         </div>
@@ -61,7 +61,8 @@ export default {
       mode: undefined,
       loading: false,
       focusedMode: '',
-      shouldHideMeta: false
+      shouldHideMeta: false,
+      shouldBreakVerses: false
     }
   },
   computed: {
@@ -99,6 +100,9 @@ export default {
     },
     toggleVerses () {
       this.shouldHideMeta = !this.shouldHideMeta
+    },
+    toggleVerseBreaks () {
+      this.shouldBreakVerses = !this.shouldBreakVerses
     },
     clearTextQuery () {
       this.textQuery = ''

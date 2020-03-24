@@ -6,6 +6,7 @@
       <button class="flex-one callout shadow" @click.prevent="zoomIn"><i class="fa fa-plus"></i></button>
     </div>
     <button class="callout" @click="toggleVerses">{{ shouldHideMeta ? 'Show' : 'Hide'}} verses</button>
+    <button class="callout margint" @click="toggleVerseBreaks">{{ shouldBreakVerses ? 'Inline' : 'New line'}} verses</button>
 
     <div class="margint">
       <p>Theme</p>
@@ -20,7 +21,7 @@
 <script>
 export default {
   name: 'settings',
-  props: ['zoomOut', 'zoomIn', 'toggleVerses', 'shouldHideMeta'],
+  props: ['zoomOut', 'zoomIn', 'toggleVerses', 'shouldHideMeta', 'toggleVerseBreaks', 'shouldBreakVerses'],
   methods: {
     setTheme (theme) {
       window.document.querySelector('html').classList.remove('light-theme')

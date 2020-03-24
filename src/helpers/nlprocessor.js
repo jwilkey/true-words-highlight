@@ -7,7 +7,7 @@ export default {
         if (term.text === '(LINEBREAK)') {
           words.push({ word: '', meta: 'linebreak' })
         } else if (term.text.match(/\(\d*:?\d*\)/)) {
-          words.push({ word: term.text.replace(/[()]/g, ''), meta: 'muted' })
+          words.push({ word: term.text.replace(/[()]/g, ''), meta: 'verse-num' })
         } else {
           if (term.whitespace.before) {
             words.push({ word: ' ', meta: 'space', id: term.uid })
