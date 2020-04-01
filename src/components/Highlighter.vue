@@ -1,8 +1,7 @@
 <template>
   <div class="highlighter">
-    <span v-for="(word, i) in words" @click="wordPressed(word)" :key="i"
-      class="twh-word"
-      :class="wordClasses(word)">{{word.word}}</span>
+    <p v-for="(word, i) in words" @click="wordPressed(word)" :key="i"
+      class="twh-word" :class="wrapperClasses(word)"><span :class="wordClasses(word)">{{word.word}}</span></p>
   </div>
 </template>
 
@@ -14,6 +13,8 @@ export default {
   name: 'highlighter',
   data () {
     return {
+      selectedVerses: {},
+      keyCommand: ''
     }
   },
   props: ['query', 'hideMeta', 'breakVerses'],
@@ -27,6 +28,19 @@ export default {
   },
   methods: {
     ...mapActions(['wordSelected']),
+    keypress (e) {
+      const cmd = String.fromCharCode(e.keyCode).toLowerCase()
+      if (cmd.match(/\d+/)) {
+        this.keyCommand = this.keyCommand + cmd
+        setTimeout(() => {
+          this.$set(this.selectedVerses, this.keyCommand, !this.selectedVerses[this.keyCommand])
+          this.keyCommand = ''
+        }, 400)
+      }
+    },
+    wrapperClasses (word) {
+      return !this.selectedVerses[word.verse] ? [] : ['selected-verse']
+    },
     wordClasses (word) {
       var classes = [word.status]
       if (word.meta) {
@@ -43,7 +57,9 @@ export default {
     },
     wordPressed (word) {
       if (word.meta) {
-        console.log(word.meta)
+        if (word.meta === 'verse-num') {
+          this.$set(this.selectedVerses, word.word, !this.selectedVerses[word.word])
+        }
       } else {
         this.wordSelected(word.word === this.selectedWord ? undefined : word.word)
       }
@@ -88,6 +104,12 @@ export default {
       })
     }
   },
+  created () {
+    window.addEventListener('keypress', this.keypress)
+  },
+  destroyed () {
+    window.removeEventListener('keypress', this.keypress)
+  },
   mounted () {
     if (this.$route.query.selection) {
       this.wordSelected(this.$route.query.selection)
@@ -114,9 +136,13 @@ function clean (word) {
   font-size: 18px;
   line-height: 1.2;
   .twh-word {
-    border-radius: 2px;
-    border: solid 1px transparent;
+    display: inline;
     word-spacing: -1px;
+    line-height: 130%;
+    span {
+      border: solid 1px transparent;
+      border-radius: 2px;
+    }
   }
   .linebreak {
     display: block;
@@ -129,16 +155,21 @@ function clean (word) {
     }
     color: #999;
   }
+  .selected-verse {
+    background-color: fade(@color-highlight-gray, 40%);
+    border-top: solid 1px fade(@color-highlight-gray, 20%);
+    border-bottom: solid 1px fade(@color-highlight-gray, 20%);
+  }
   .synonym {
     text-shadow: 1px 0px 3px black;
     color: white;
-    border: solid 1px @color-highlight-red;
+    border-color: @color-highlight-red !important;
     background-color: fade(@color-highlight-red, 50%);
   }
   .match {
     text-shadow: 1px 0px 3px black;
     color: white;
-    border: solid 1px darken(@color-highlight-blue, 30%);
+    border-color: darken(@color-highlight-blue, 30%) !important;
     background-color: @color-highlight-blue;
   }
   .match-4 {

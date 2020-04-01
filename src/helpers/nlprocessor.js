@@ -1,26 +1,28 @@
 export default {
   extractWords (nlpDoc) {
-    var words = []
-
+    const words = []
+    let verse
     nlpDoc.terms().list.forEach(outerTerm => {
-      outerTerm.terms.forEach((term, index) => {
+      for (const term of outerTerm.terms) {
         if (term.text === '(LINEBREAK)') {
           words.push({ word: '', meta: 'linebreak' })
         } else if (term.text.match(/\(\d*:?\d*\)/)) {
-          words.push({ word: term.text.replace(/[()]/g, ''), meta: 'verse-num' })
+          const verseNum = term.text.replace(/[()]/g, '')
+          verse = verseNum
+          words.push({ word: verseNum, verse, meta: 'verse-num' })
         } else {
           if (term.whitespace.before) {
-            words.push({ word: ' ', meta: 'space', id: term.uid })
+            words.push({ word: ' ', verse, meta: 'space', id: term.uid })
           }
           term.text.split(/([^a-zA-Z\n']+)/g).forEach(t => {
             const isWord = t.match(/[a-zA-Z]/) !== null
-            words.push({ word: t, root: term.root, status: '', id: isWord ? term.uid : undefined, meta: isWord ? undefined : 'punctuation' })
+            words.push({ word: t, verse, root: term.root, status: '', id: isWord ? term.uid : undefined, meta: isWord ? undefined : 'punctuation' })
           })
           if (term.whitespace.after) {
-            words.push({ word: ' ', meta: 'space', id: term.uid })
+            words.push({ word: ' ', verse, meta: 'space', id: term.uid })
           }
         }
-      })
+      }
     })
 
     return words
