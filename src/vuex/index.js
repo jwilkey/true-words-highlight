@@ -48,13 +48,14 @@ export const actions = {
   setWords ({ commit }, words) {
     commit('SET_WORDS', words)
 
-    var wordCounts = {}
-    words.reduce((counts, word) => {
+    const wordCounts = words.reduce((counts, word) => {
       if (word.word && !word.word.match(/[\s.'0-9]/)) {
-        wordCounts[word.word] = (wordCounts[word.word] || 0) + 1
+        const w = word.word.replace(word.word.charAt(0), word.word.charAt(0).toUpperCase())
+        counts[w] = (counts[w] || 0) + 1
       }
+      return counts
     }, {})
-    var counts = Object.entries(wordCounts).sort((a, b) => b[1] - a[1])
+    const counts = Object.entries(wordCounts).sort((a, b) => b[1] - a[1])
 
     commit('SET_WORD_COUNTS', counts)
   },

@@ -1,6 +1,8 @@
 <template>
   <div class="highlighter">
-    <span v-for="word in words" @click="wordPressed(word)" class="twh-word" :class="wordClasses(word)">{{word.word}}</span>
+    <span v-for="(word, i) in words" @click="wordPressed(word)" :key="i"
+      class="twh-word"
+      :class="wordClasses(word)">{{word.word}}</span>
   </div>
 </template>
 
@@ -24,7 +26,7 @@ export default {
     ...mapGetters(['words', 'selectedWord', 'focusedIds', 'translation'])
   },
   methods: {
-    ...mapActions(['setWords', 'wordSelected']),
+    ...mapActions(['wordSelected']),
     wordClasses (word) {
       var classes = [word.status]
       if (word.meta) {
@@ -40,7 +42,9 @@ export default {
       return classes
     },
     wordPressed (word) {
-      if (!word.meta) {
+      if (word.meta) {
+        console.log(word.meta)
+      } else {
         this.wordSelected(word.word === this.selectedWord ? undefined : word.word)
       }
     },
@@ -55,18 +59,14 @@ export default {
           return true
         }
 
-        var w1 = w.word
-        var w2 = this.selectedWord
+        var w1 = w.word.toLowerCase()
+        var w2 = this.selectedWord.toLowerCase()
         if (w1 === w2) {
           w.status = 'match'
         } else {
-          var matchLevel = 0
-          for (var i = 0; i < (w1.length < w2.length ? w1.length : w2.length); i++) {
-            if (w1[i] === w2[i] && matchLevel < 4) {
-              matchLevel++
-            } else {
-              break
-            }
+          let matchLevel = 0
+          while (w1.charAt(matchLevel) === w2.charAt(matchLevel) && matchLevel < 5) {
+            matchLevel++
           }
           w.status = matchLevel > 0 ? `match-${matchLevel}` : ''
         }

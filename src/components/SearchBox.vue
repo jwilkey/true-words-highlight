@@ -110,17 +110,17 @@ export default {
       const self = this
       if (this.translation === 'ESV') {
         this.searchESV()
-        .then(words => {
-          self.setWords(words)
-          self.onDone()
-        }, this.onFail)
+          .then(words => {
+            self.setWords(words)
+            self.onDone()
+          }, this.onFail)
       } else {
         dbtService.fetch(this.bookId)
-        .then(words => {
-          self.setPassage(self.bookId)
-          self.setWords(words)
-          self.onDone()
-        }, this.onFail)
+          .then(words => {
+            self.setPassage(self.bookId)
+            self.setWords(words)
+            self.onDone()
+          }, this.onFail)
       }
     },
     loadQuery () {
@@ -136,16 +136,16 @@ export default {
     searchESV () {
       const self = this
       return bibleApi.searchEsv(this.passageQuery)
-      .then(result => {
-        self.loading = false
-        self.passageQuery = ''
-        self.setPassage(result.reference)
-        self.setCopyright(result.copyright)
+        .then(result => {
+          self.loading = false
+          self.passageQuery = ''
+          self.setPassage(result.reference)
+          self.setCopyright(result.copyright)
 
-        var nlpDoc = nlp(result.text)
-        self.setNlp(nlpDoc)
-        return nlprocessor.extractWords(nlpDoc)
-      })
+          var nlpDoc = nlp(result.text)
+          self.setNlp(nlpDoc)
+          return nlprocessor.extractWords(nlpDoc)
+        })
     }
   },
   mounted () {
