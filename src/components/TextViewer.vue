@@ -1,13 +1,14 @@
 <template>
-  <div class="text-viewer theme-back">
+  <div class="text-viewer theme-back vfull">
     <search-box id="searcher" class="theme-mid shadow-long" v-if="searchingPassage" :on-done="searchComplete"></search-box>
 
-    <div id="content" v-if="hasWords" class="flex-column" :class="{blur: searchingPassage || loading}">
+    <div id="content" v-if="hasWords" class="flex-column vfull" :class="{blur: searchingPassage || loading}">
       <div id="menubar" v-if="passage" class="theme-mid shadow-long hi-bottom">
         <div class="flex-row align-center">
           <p class="passage shadow" @click="startSearch">{{passage}}</p>
           <div class="flex-one"></div>
           <div class="buttons">
+            <i class="fa fa-times-circle" @click="clearSelections"></i>
             <i class="fa fa-search" :class="{active: mode === 'search'}" @click="toggleSearchText"></i>
             <i class="fa fa-file-text-o" :class="{active: mode === 'word-counts'}" @click="toggleWordCounts"></i>
             <i class="fa fa-gear" :class="{active: mode === 'settings'}" @click="toggleSettings"></i>
@@ -21,7 +22,7 @@
         </transition>
       </div>
 
-      <div class="flex-one flex-row relative vfull">
+      <div class="flex-one scrolly flex-row relative vfull">
         <div class="flex-one flex-column vfull">
           <div class="flex-one scrolly">
             <highlighter ref="highlighter" :query="textQuery" :hide-meta="shouldHideMeta" :break-verses="shouldBreakVerses"></highlighter>
@@ -71,7 +72,7 @@ export default {
       return this.words && this.words.length
     },
     wordCount () {
-      const count = [...this.wordCounts].find(wc => wc[0] === this.selectedWord)
+      const count = [...this.wordCounts].find(wc => wc[0].toLowerCase() === this.selectedWord.toLowerCase())
       return count ? count[1] : undefined
     },
     hasNlp () {
@@ -83,12 +84,16 @@ export default {
   },
   components: { SearchBox, Highlighter, WordsMenu, Settings },
   methods: {
-    ...mapActions(['setFocusedIds']),
+    ...mapActions(['setFocusedIds', 'clearAll']),
     startSearch () {
       this.searchingPassage = true
     },
     searchComplete () {
       this.searchingPassage = false
+    },
+    clearSelections () {
+      this.textQuery = ''
+      this.clearAll()
     },
     toggleSearchText () {
       this.mode = this.mode === 'search' ? undefined : 'search'

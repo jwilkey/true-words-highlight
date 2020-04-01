@@ -13,7 +13,7 @@ export default {
   name: 'highlighter',
   data () {
     return {
-      selectedVerses: {},
+      // selectedVerses: {},
       keyCommand: ''
     }
   },
@@ -24,16 +24,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['words', 'selectedWord', 'focusedIds', 'translation'])
+    ...mapGetters(['words', 'selectedWord', 'selectedVerses', 'focusedIds', 'translation'])
   },
   methods: {
-    ...mapActions(['wordSelected']),
+    ...mapActions(['wordSelected', 'verseSelected']),
     keypress (e) {
       const cmd = String.fromCharCode(e.keyCode).toLowerCase()
       if (cmd.match(/\d+/)) {
         this.keyCommand = this.keyCommand + cmd
         setTimeout(() => {
-          this.$set(this.selectedVerses, this.keyCommand, !this.selectedVerses[this.keyCommand])
+          this.verseSelected(this.keyCommand)
+          // this.$set(this.selectedVerses, this.keyCommand, !this.selectedVerses[this.keyCommand])
           this.keyCommand = ''
         }, 400)
       }
@@ -58,7 +59,8 @@ export default {
     wordPressed (word) {
       if (word.meta) {
         if (word.meta === 'verse-num') {
-          this.$set(this.selectedVerses, word.word, !this.selectedVerses[word.word])
+          this.verseSelected(word.word)
+          // this.$set(this.selectedVerses, word.word, !this.selectedVerses[word.word])
         }
       } else {
         this.wordSelected(word.word === this.selectedWord ? undefined : word.word)

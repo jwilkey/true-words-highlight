@@ -12,6 +12,7 @@ export const state = {
   words: [],
   wordCounts: {},
   selectedWord: undefined,
+  selectedVerses: {},
   nlp: undefined,
   focusedIds: []
 }
@@ -25,6 +26,7 @@ export const getters = {
   words: state => state.words,
   wordCounts: state => state.wordCounts,
   selectedWord: state => state.selectedWord,
+  selectedVerses: state => state.selectedVerses,
   nlp: state => state.nlp,
   focusedIds: state => state.focusedIds
 }
@@ -59,8 +61,16 @@ export const actions = {
 
     commit('SET_WORD_COUNTS', counts)
   },
+  clearAll ({ commit }) {
+    commit('SET_SELECTED_VERSES', {})
+    commit('SET_SELECTED_WORD', undefined)
+  },
   wordSelected ({ commit }, word) {
     commit('SET_SELECTED_WORD', word)
+    commit('SET_FOCUSED_IDS', [])
+  },
+  verseSelected ({commit}, verse) {
+    commit('VERSE_SELECTED', verse)
   },
   setNlp ({ commit }, nlp) {
     commit('SET_NLP', nlp)
@@ -89,11 +99,17 @@ export const mutations = {
   SET_WORDS (state, words) {
     state.words = words
   },
+  VERSE_SELECTED (state, verse) {
+    state.selectedVerses = { ...state.selectedVerses, [verse]: !state.selectedVerses[verse] }
+  },
   SET_WORD_COUNTS (state, wordCounts) {
     state.wordCounts = wordCounts
   },
   SET_SELECTED_WORD (state, word) {
     state.selectedWord = word
+  },
+  SET_SELECTED_VERSES (state, verses) {
+    state.selectedVerses = verses
   },
   SET_NLP (state, nlp) {
     state.nlp = nlp
