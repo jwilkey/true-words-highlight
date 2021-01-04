@@ -14,7 +14,7 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs"
   },
   "dependencies": {
-    "axios": "^0.16.2",
+    "axios": "^0.21.1",
     "bible-passage-reference-parser": "^2.0.1",
     "compromise": "^11.0.2",
     "gh-pages": "^1.0.0",
